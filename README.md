@@ -24,3 +24,4 @@
 - main.tsx: xương sống của dự án
 - index.html: đương nhiên rồi, dự án mà ko có file html thì sao chạy đc
 - Còn những cái khác giải thích sau vì nó dài dòng vcl, tạm thời chỉ cần thế thôi
+- Anh Nam đẹp trai hơn vua
