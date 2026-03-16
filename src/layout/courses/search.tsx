@@ -1,5 +1,5 @@
 // components/HeaderWithSearch.tsx
-import { NavLink } from "react-router-dom";
+
 import { FaSearch } from "react-icons/fa";
 import { HiChevronDown } from "react-icons/hi";
 import { useState } from "react";
