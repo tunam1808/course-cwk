@@ -1,12 +1,14 @@
 import Header from "@/default/header";
 import Search from "@/layout/courses/search";
-import Lesson from "@/layout/courses/lessons";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="min-h-screen bg-gray-950 flex flex-col">
       <Header />
-      Nghĩ ý tưởng đê, có gì đâu mà vào xem :))))
+      <Search />
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-white">
+        Tính năng đang phát triển
+      </div>
     </div>
   );
 }
