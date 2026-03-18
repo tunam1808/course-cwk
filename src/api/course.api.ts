@@ -15,6 +15,51 @@ export const courseApi = {
     return response.data;
   },
 
+  // 👇 THÊM MỚI: Bước 1 - Tạo video slot trên Bunny
+  prepareUpload: async (title: string) => {
+    const response = await axios.post(
+      `${BASE_URL}/courses/prepare-upload`,
+      { title },
+      authHeader(),
+    );
+    return response.data; // { videoId }
+  },
+
+  // 👇 THÊM MỚI: Bước 2 - Lưu vào DB sau khi FE upload xong
+  saveCourse: async (data: {
+    title: string;
+    category: string;
+    duration: number;
+    fileSize: number;
+    videoId: string;
+  }) => {
+    const response = await axios.post(
+      `${BASE_URL}/courses/save`,
+      data,
+      authHeader(),
+    );
+    return response.data;
+  },
+
+  // 👇 THÊM MỚI: Update DB sau khi FE upload video mới
+  saveUpdateCourse: async (
+    id: number,
+    data: {
+      title: string;
+      category: string;
+      duration: number;
+      fileSize: number;
+      videoId?: string;
+    },
+  ) => {
+    const response = await axios.put(
+      `${BASE_URL}/courses/${id}`,
+      data,
+      authHeader(),
+    );
+    return response.data;
+  },
+
   createCourse: async (
     data: {
       title: string;
@@ -24,7 +69,7 @@ export const courseApi = {
       video?: File;
     },
     onProgress?: (percent: number) => void,
-    signal?: AbortSignal, // 👈 thêm
+    signal?: AbortSignal,
   ) => {
     const formData = new FormData();
     formData.append("title", data.title);
@@ -40,7 +85,7 @@ export const courseApi = {
         Authorization: `Bearer ${getToken()}`,
         "Content-Type": "multipart/form-data",
       },
-      signal, // 👈 thêm
+      signal,
       onUploadProgress: (e) => {
         if (e.total) {
           const percent = Math.round((e.loaded * 100) / e.total);
@@ -61,7 +106,7 @@ export const courseApi = {
       video?: File;
     },
     onProgress?: (percent: number) => void,
-    signal?: AbortSignal, // 👈 thêm
+    signal?: AbortSignal,
   ) => {
     const formData = new FormData();
     if (data.title) formData.append("title", data.title);
@@ -75,7 +120,7 @@ export const courseApi = {
         Authorization: `Bearer ${getToken()}`,
         "Content-Type": "multipart/form-data",
       },
-      signal, // 👈 thêm
+      signal,
       onUploadProgress: (e) => {
         if (e.total) {
           const percent = Math.round((e.loaded * 100) / e.total);

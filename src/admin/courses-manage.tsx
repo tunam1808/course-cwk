@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import * as tus from "tus-js-client";
 import { courseApi } from "@/api/course.api";
 import { showSuccess, showError } from "@/common/toast";
 import ConfirmDialog from "@/common/ConfirmDialog";
@@ -44,8 +45,8 @@ export default function CoursesManage() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const abortRef = useRef<AbortController | null>(null); // 👈 thêm
+  const tusUploadRef = useRef<tus.Upload | null>(null); // 👈 thay intervalRef bằng tusUploadRef
+  const abortRef = useRef<AbortController | null>(null);
   const [formData, setFormData] = useState<FormData>({
     title: "",
     category: "CAPCUT_AI",
@@ -128,11 +129,7 @@ export default function CoursesManage() {
 
   const handleCancelClick = () => {
     if (uploading) {
-      // Tạm dừng interval khi dialog bật lên
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
+      tusUploadRef.current?.abort();
       setShowCancelConfirm(true);
     } else {
       setShowModal(false);
@@ -140,14 +137,11 @@ export default function CoursesManage() {
   };
 
   const handleConfirmCancel = () => {
-    // Hủy request HTTP → BE nhận được và dừng upload Bunny
+    tusUploadRef.current?.abort();
+    tusUploadRef.current = null;
     if (abortRef.current) {
       abortRef.current.abort();
       abortRef.current = null;
-    }
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
     }
     setShowCancelConfirm(false);
     setShowModal(false);
@@ -156,22 +150,8 @@ export default function CoursesManage() {
   };
 
   const handleKeepUploading = () => {
-    // Tiếp tục upload — khởi động lại interval từ chỗ đang dừng
     setShowCancelConfirm(false);
-    const currentProgress = uploadProgress;
-    let fakeProgress = currentProgress;
-    const fileSizeMB = videoFile ? videoFile.size / (1024 * 1024) : 0;
-    const estimatedSeconds = Math.max(10, fileSizeMB * 0.5);
-    const intervalMs = (estimatedSeconds * 1000) / 90;
-
-    intervalRef.current = setInterval(() => {
-      fakeProgress += 1;
-      if (fakeProgress >= 90) {
-        fakeProgress = 90;
-        if (intervalRef.current) clearInterval(intervalRef.current);
-      }
-      setUploadProgress(Math.round(fakeProgress));
-    }, intervalMs);
+    tusUploadRef.current?.start(); // tiếp tục upload tus
   };
 
   const handleSubmit = async () => {
@@ -198,48 +178,70 @@ export default function CoursesManage() {
     try {
       setUploading(true);
       setUploadProgress(0);
-
-      // Tạo AbortController mới cho mỗi lần upload
       abortRef.current = new AbortController();
 
-      const fileSizeMB = videoFile ? videoFile.size / (1024 * 1024) : 0;
-      const estimatedSeconds = Math.max(10, fileSizeMB * 0.5);
-      const intervalMs = (estimatedSeconds * 1000) / 90;
+      if (videoFile) {
+        // Bước 1: Tạo video slot trên Bunny
+        const { videoId } = await courseApi.prepareUpload(formData.title);
 
-      let fakeProgress = 0;
-      intervalRef.current = setInterval(() => {
-        fakeProgress += 1;
-        if (fakeProgress >= 90) {
-          fakeProgress = 90;
-          if (intervalRef.current) clearInterval(intervalRef.current);
+        // Bước 2: Upload thẳng từ browser lên Bunny qua tus
+        await new Promise<void>((resolve, reject) => {
+          const upload = new tus.Upload(videoFile, {
+            endpoint: "https://video.bunnycdn.com/tusupload",
+            retryDelays: [0, 3000, 5000, 10000],
+            headers: {
+              AuthorizationSignature: "",
+              AuthorizationExpire: "0",
+              VideoId: videoId,
+              LibraryId: import.meta.env.VITE_BUNNY_LIBRARY_ID,
+            },
+            metadata: {
+              filetype: videoFile.type,
+              title: formData.title,
+            },
+            onProgress(uploaded, total) {
+              setUploadProgress(Math.round((uploaded / total) * 90));
+            },
+            onSuccess() {
+              resolve();
+            },
+            onError(err) {
+              reject(err);
+            },
+          });
+
+          tusUploadRef.current = upload;
+          upload.start();
+        });
+
+        // Bước 3: Lưu vào DB
+        if (editCourse) {
+          await courseApi.saveUpdateCourse(editCourse.id, {
+            title: formData.title,
+            category: formData.category,
+            duration: Number(formData.duration),
+            fileSize: Number(formData.fileSize),
+            videoId,
+          });
+        } else {
+          await courseApi.saveCourse({
+            title: formData.title,
+            category: formData.category,
+            duration: Number(formData.duration),
+            fileSize: Number(formData.fileSize),
+            videoId,
+          });
         }
-        setUploadProgress(Math.round(fakeProgress));
-      }, intervalMs);
-
-      const payload = {
-        title: formData.title,
-        category: formData.category,
-        duration: Number(formData.duration),
-        fileSize: Number(formData.fileSize),
-        video: videoFile || undefined,
-      };
-
-      if (editCourse) {
-        await courseApi.updateCourse(
-          editCourse.id,
-          payload,
-          undefined,
-          abortRef.current.signal, // 👈 truyền signal
-        );
-      } else {
-        await courseApi.createCourse(
-          payload,
-          undefined,
-          abortRef.current.signal, // 👈 truyền signal
-        );
+      } else if (editCourse) {
+        // Không đổi video, chỉ update thông tin
+        await courseApi.saveUpdateCourse(editCourse.id, {
+          title: formData.title,
+          category: formData.category,
+          duration: Number(formData.duration),
+          fileSize: Number(formData.fileSize),
+        });
       }
 
-      if (intervalRef.current) clearInterval(intervalRef.current);
       setUploadProgress(100);
       await new Promise((r) => setTimeout(r, 600));
 
@@ -250,18 +252,20 @@ export default function CoursesManage() {
       );
       setShowModal(false);
       fetchCourses();
-    } catch (err: any) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-
-      // Nếu bị abort thì không hiện lỗi
-      if (err.code === "ERR_CANCELED" || err.name === "AbortError") return;
-
-      const message = err.response?.data?.message || "Có lỗi xảy ra";
+    } catch (err: unknown) {
+      const error = err as {
+        code?: string;
+        name?: string;
+        response?: { data?: { message?: string } };
+      };
+      if (error.code === "ERR_CANCELED" || error.name === "AbortError") return;
+      const message = error.response?.data?.message || "Có lỗi xảy ra";
       setError(message);
       showError(message);
     } finally {
       setUploading(false);
       setUploadProgress(0);
+      tusUploadRef.current = null;
     }
   };
 
@@ -532,7 +536,6 @@ export default function CoursesManage() {
         </div>
       )}
 
-      {/* Dialog xác nhận hủy upload */}
       {showCancelConfirm && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60]">
           <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-sm shadow-xl">
@@ -545,13 +548,13 @@ export default function CoursesManage() {
             </p>
             <div className="flex gap-3">
               <button
-                onClick={handleKeepUploading} // 👈 tiếp tục upload
+                onClick={handleKeepUploading}
                 className="flex-1 px-4 py-2 border border-gray-600 text-gray-300 hover:text-white rounded-lg transition-colors"
               >
                 Tiếp tục upload
               </button>
               <button
-                onClick={handleConfirmCancel} // 👈 hủy upload
+                onClick={handleConfirmCancel}
                 className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-400 text-white font-bold rounded-lg transition-all"
               >
                 Hủy upload
@@ -561,7 +564,6 @@ export default function CoursesManage() {
         </div>
       )}
 
-      {/* Dialog xác nhận xóa */}
       <ConfirmDialog
         open={showConfirm}
         onClose={() => setShowConfirm(false)}
