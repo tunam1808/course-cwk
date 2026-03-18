@@ -35,6 +35,7 @@ const CATEGORY_ORDER: Record<string, number> = {
 
 export default function CoursesManage() {
   const [courses, setCourses] = useState<Course[]>([]);
+  const expire = Math.floor(Date.now() / 1000) + 60 * 60;
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editCourse, setEditCourse] = useState<Course | null>(null);
@@ -190,8 +191,8 @@ export default function CoursesManage() {
             endpoint: "https://video.bunnycdn.com/tusupload",
             retryDelays: [0, 3000, 5000, 10000],
             headers: {
-              AuthorizationSignature: "",
-              AuthorizationExpire: "0",
+              AuthorizationSignature: import.meta.env.VITE_BUNNY_ACCESS_KEY,
+              AuthorizationExpire: String(expire),
               VideoId: videoId,
               LibraryId: import.meta.env.VITE_BUNNY_LIBRARY_ID,
             },
