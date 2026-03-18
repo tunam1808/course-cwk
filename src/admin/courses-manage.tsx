@@ -35,7 +35,6 @@ const CATEGORY_ORDER: Record<string, number> = {
 
 export default function CoursesManage() {
   const [courses, setCourses] = useState<Course[]>([]);
-  const expire = Math.floor(Date.now() / 1000) + 60 * 60;
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editCourse, setEditCourse] = useState<Course | null>(null);
@@ -185,13 +184,16 @@ export default function CoursesManage() {
         // Bước 1: Tạo video slot trên Bunny
         const { videoId } = await courseApi.prepareUpload(formData.title);
 
-        // Bước 2: Upload thẳng từ browser lên Bunny qua tus
+        // Bước 2: Lấy signature từ backend
+        const { signature, expire } = await courseApi.signUpload(videoId);
+
+        // Bước 3: Upload thẳng từ browser lên Bunny qua tus
         await new Promise<void>((resolve, reject) => {
           const upload = new tus.Upload(videoFile, {
             endpoint: "https://video.bunnycdn.com/tusupload",
             retryDelays: [0, 3000, 5000, 10000],
             headers: {
-              AuthorizationSignature: import.meta.env.VITE_BUNNY_ACCESS_KEY,
+              AuthorizationSignature: signature,
               AuthorizationExpire: String(expire),
               VideoId: videoId,
               LibraryId: import.meta.env.VITE_BUNNY_LIBRARY_ID,
@@ -215,7 +217,7 @@ export default function CoursesManage() {
           upload.start();
         });
 
-        // Bước 3: Lưu vào DB
+        // Bước 4: Lưu vào DB
         if (editCourse) {
           await courseApi.saveUpdateCourse(editCourse.id, {
             title: formData.title,

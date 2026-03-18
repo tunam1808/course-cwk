@@ -15,17 +15,25 @@ export const courseApi = {
     return response.data;
   },
 
-  // 👇 THÊM MỚI: Bước 1 - Tạo video slot trên Bunny
   prepareUpload: async (title: string) => {
     const response = await axios.post(
       `${BASE_URL}/courses/prepare-upload`,
       { title },
       authHeader(),
     );
-    return response.data; // { videoId }
+    return response.data;
   },
 
-  // 👇 THÊM MỚI: Bước 2 - Lưu vào DB sau khi FE upload xong
+  // 👇 THÊM MỚI: Lấy signature từ backend để upload lên Bunny
+  signUpload: async (videoId: string) => {
+    const response = await axios.post(
+      `${BASE_URL}/courses/sign-upload`,
+      { videoId },
+      authHeader(),
+    );
+    return response.data; // { signature, expire }
+  },
+
   saveCourse: async (data: {
     title: string;
     category: string;
@@ -41,7 +49,6 @@ export const courseApi = {
     return response.data;
   },
 
-  // 👇 THÊM MỚI: Update DB sau khi FE upload video mới
   saveUpdateCourse: async (
     id: number,
     data: {
