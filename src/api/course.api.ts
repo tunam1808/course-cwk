@@ -15,6 +15,15 @@ export const courseApi = {
     return response.data;
   },
 
+  reorderCourses: async (orders: { id: number; order: number }[]) => {
+    const response = await axios.put(
+      `${BASE_URL}/courses/reorder`,
+      { orders },
+      authHeader(),
+    );
+    return response.data;
+  },
+
   prepareUpload: async (title: string) => {
     const response = await axios.post(
       `${BASE_URL}/courses/prepare-upload`,
@@ -24,14 +33,13 @@ export const courseApi = {
     return response.data;
   },
 
-  // 👇 THÊM MỚI: Lấy signature từ backend để upload lên Bunny
   signUpload: async (videoId: string) => {
     const response = await axios.post(
       `${BASE_URL}/courses/sign-upload`,
       { videoId },
       authHeader(),
     );
-    return response.data; // { signature, expire }
+    return response.data;
   },
 
   saveCourse: async (data: {

@@ -1,5 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as tus from "tus-js-client";
+import type { DragEndEvent } from "@dnd-kit/core"; //
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { courseApi } from "@/api/course.api";
 import { showSuccess, showError } from "@/common/toast";
 import ConfirmDialog from "@/common/ConfirmDialog";
@@ -33,6 +50,98 @@ const CATEGORY_ORDER: Record<string, number> = {
   MIEN_PHI: 2,
 };
 
+// Component row có thể kéo thả
+function SortableRow({
+  course,
+  index,
+  courses,
+  onEdit,
+  onDelete,
+}: {
+  course: Course;
+  index: number;
+  courses: Course[];
+  onEdit: (course: Course) => void;
+  onDelete: (id: number) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: course.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    background: isDragging ? "#1f2937" : undefined,
+  };
+
+  const prevCategory = index > 0 ? courses[index - 1].category : null;
+  const showGroupHeader = course.category !== prevCategory;
+
+  return (
+    <React.Fragment>
+      {showGroupHeader && (
+        <tr>
+          <td colSpan={8} className="px-6 py-2 bg-gray-800/50">
+            <span className="text-xs font-bold text-yellow-500 uppercase tracking-wider">
+              {CATEGORY_LABELS[course.category]}
+            </span>
+          </td>
+        </tr>
+      )}
+      <tr
+        ref={setNodeRef}
+        style={style}
+        className="hover:bg-gray-800/50 transition-colors"
+      >
+        {/* Icon kéo thả */}
+        <td
+          className="px-3 py-4 text-gray-500 cursor-grab active:cursor-grabbing"
+          {...attributes}
+          {...listeners}
+        >
+          ⠿
+        </td>
+        <td className="px-6 py-4 text-sm text-gray-300">#{course.id}</td>
+        <td className="px-6 py-4 text-sm text-gray-300">{course.title}</td>
+        <td className="px-6 py-4 text-sm">
+          <span className="px-2 py-1 rounded-full text-xs bg-yellow-500/20 text-yellow-400">
+            {CATEGORY_LABELS[course.category]}
+          </span>
+        </td>
+        <td className="px-6 py-4 text-sm text-gray-300">
+          {course.duration ? `${course.duration} phút` : "—"}
+        </td>
+        <td className="px-6 py-4 text-sm text-gray-300">
+          {course.fileSize ? `${course.fileSize} MB` : "—"}
+        </td>
+        <td className="px-6 py-4 text-sm text-gray-300">
+          {new Date(course.uploadedAt).toLocaleDateString("vi-VN")}
+        </td>
+        <td className="px-6 py-4 text-sm">
+          <button
+            onClick={() => onEdit(course)}
+            className="text-yellow-400 hover:text-yellow-300 mr-3"
+          >
+            Sửa
+          </button>
+          <button
+            onClick={() => onDelete(course.id)}
+            className="text-red-400 hover:text-red-300"
+          >
+            Xóa
+          </button>
+        </td>
+      </tr>
+    </React.Fragment>
+  );
+}
+
 export default function CoursesManage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +154,7 @@ export default function CoursesManage() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
-  const tusUploadRef = useRef<tus.Upload | null>(null); // 👈 thay intervalRef bằng tusUploadRef
+  const tusUploadRef = useRef<tus.Upload | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const [formData, setFormData] = useState<FormData>({
     title: "",
@@ -55,6 +164,13 @@ export default function CoursesManage() {
   });
   const [error, setError] = useState("");
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
   const fetchCourses = async () => {
     try {
       const data = await courseApi.getCourses();
@@ -63,9 +179,7 @@ export default function CoursesManage() {
           (CATEGORY_ORDER[a.category] ?? 99) -
           (CATEGORY_ORDER[b.category] ?? 99);
         if (catDiff !== 0) return catDiff;
-        return (
-          new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime()
-        );
+        return (a.order ?? 0) - (b.order ?? 0);
       });
       setCourses(sorted);
     } catch {
@@ -78,6 +192,33 @@ export default function CoursesManage() {
   useEffect(() => {
     fetchCourses();
   }, []);
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = courses.findIndex((c) => c.id === active.id);
+    const newIndex = courses.findIndex((c) => c.id === over.id);
+
+    // Chỉ cho phép kéo trong cùng category
+    if (courses[oldIndex].category !== courses[newIndex].category) {
+      showError("Chỉ có thể sắp xếp trong cùng loại khóa học!");
+      return;
+    }
+
+    const newCourses = arrayMove(courses, oldIndex, newIndex);
+    setCourses(newCourses);
+
+    // Lưu thứ tự mới vào DB
+    try {
+      const orders = newCourses.map((c, i) => ({ id: c.id, order: i }));
+      await courseApi.reorderCourses(orders);
+      showSuccess("Đã cập nhật thứ tự!");
+    } catch {
+      showError("Không thể lưu thứ tự!");
+      fetchCourses(); // rollback
+    }
+  };
 
   const handleOpenCreate = () => {
     setEditCourse(null);
@@ -151,7 +292,7 @@ export default function CoursesManage() {
 
   const handleKeepUploading = () => {
     setShowCancelConfirm(false);
-    tusUploadRef.current?.start(); // tiếp tục upload tus
+    tusUploadRef.current?.start();
   };
 
   const handleSubmit = async () => {
@@ -181,13 +322,9 @@ export default function CoursesManage() {
       abortRef.current = new AbortController();
 
       if (videoFile) {
-        // Bước 1: Tạo video slot trên Bunny
         const { videoId } = await courseApi.prepareUpload(formData.title);
-
-        // Bước 2: Lấy signature từ backend
         const { signature, expire } = await courseApi.signUpload(videoId);
 
-        // Bước 3: Upload thẳng từ browser lên Bunny qua tus
         await new Promise<void>((resolve, reject) => {
           const upload = new tus.Upload(videoFile, {
             endpoint: "https://video.bunnycdn.com/tusupload",
@@ -217,7 +354,6 @@ export default function CoursesManage() {
           upload.start();
         });
 
-        // Bước 4: Lưu vào DB
         if (editCourse) {
           await courseApi.saveUpdateCourse(editCourse.id, {
             title: formData.title,
@@ -236,7 +372,6 @@ export default function CoursesManage() {
           });
         }
       } else if (editCourse) {
-        // Không đổi video, chỉ update thông tin
         await courseApi.saveUpdateCourse(editCourse.id, {
           title: formData.title,
           category: formData.category,
@@ -303,6 +438,9 @@ export default function CoursesManage() {
           <table className="min-w-full divide-y divide-gray-800">
             <thead>
               <tr>
+                <th className="px-3 py-4 text-left text-sm font-medium text-gray-400">
+                  ⠿
+                </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">
                   ID
                 </th>
@@ -326,65 +464,29 @@ export default function CoursesManage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800">
-              {courses.map((course, index) => {
-                const prevCategory =
-                  index > 0 ? courses[index - 1].category : null;
-                const showGroupHeader = course.category !== prevCategory;
-
-                return (
-                  <React.Fragment key={course.id}>
-                    {showGroupHeader && (
-                      <tr>
-                        <td colSpan={7} className="px-6 py-2 bg-gray-800/50">
-                          <span className="text-xs font-bold text-yellow-500 uppercase tracking-wider">
-                            {CATEGORY_LABELS[course.category]}
-                          </span>
-                        </td>
-                      </tr>
-                    )}
-                    <tr className="hover:bg-gray-800/50 transition-colors">
-                      <td className="px-6 py-4 text-sm text-gray-300">
-                        #{course.id}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-300">
-                        {course.title}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <span className="px-2 py-1 rounded-full text-xs bg-yellow-500/20 text-yellow-400">
-                          {CATEGORY_LABELS[course.category]}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-300">
-                        {course.duration ? `${course.duration} phút` : "—"}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-300">
-                        {course.fileSize ? `${course.fileSize} MB` : "—"}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-300">
-                        {new Date(course.uploadedAt).toLocaleDateString(
-                          "vi-VN",
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <button
-                          onClick={() => handleOpenEdit(course)}
-                          className="text-yellow-400 hover:text-yellow-300 mr-3"
-                        >
-                          Sửa
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(course.id)}
-                          className="text-red-400 hover:text-red-300"
-                        >
-                          Xóa
-                        </button>
-                      </td>
-                    </tr>
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={courses.map((c) => c.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <tbody className="divide-y divide-gray-800">
+                  {courses.map((course, index) => (
+                    <SortableRow
+                      key={course.id}
+                      course={course}
+                      index={index}
+                      courses={courses}
+                      onEdit={handleOpenEdit}
+                      onDelete={handleDeleteClick}
+                    />
+                  ))}
+                </tbody>
+              </SortableContext>
+            </DndContext>
           </table>
         </div>
       )}
