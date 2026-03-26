@@ -1,13 +1,24 @@
+import { useNavigate } from "react-router-dom";
+
 export default function Introduce() {
+  const navigate = useNavigate();
   return (
     <div className="flex items-stretch max-w-[1100px] mx-auto gap-4 mt-4">
       {/* Phần ảnh - 70% */}
-      <div className="w-[60%]">
+      <div className="w-[60%] relative">
         <img
           src="/introduce.png"
           alt="Course Thumbnail"
           className="w-full h-full object-cover rounded-xl border-2"
         />
+
+        <button
+          onClick={() => navigate("/free-courses")}
+          className="absolute top-1/2 right-4 -translate-y-1/2 mt-10 mr-6 flex items-center justify-center gap-3 px-15 py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-lg transition-all text-sm uppercase tracking-wide cursor-pointer"
+        >
+          Chi tiết khóa học
+          <span className="text-xl">→</span>
+        </button>
       </div>
 
       {/* Phần mô tả - 30% */}
@@ -37,7 +48,10 @@ export default function Introduce() {
           </li>
         </ul>
 
-        <button className="flex items-center justify-center gap-3 px-6 py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-lg transition-all text-sm uppercase tracking-wide">
+        <button
+          onClick={() => navigate("/list-courses")}
+          className="flex items-center justify-center gap-3 px-6 py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-lg transition-all text-sm uppercase tracking-wide cursor-pointer"
+        >
           Chi tiết khóa học
           <span className="text-xl">→</span>
         </button>
@@ -45,10 +59,10 @@ export default function Introduce() {
         {/* Video giới thiệu */}
         <div className="rounded-xl overflow-hidden border-2 border-gray-700 bg-black aspect-video">
           <video
-            src="/intro-video.mp4"
+            // src="/intro-video.mp4"
             controls
             className="w-full h-full object-cover"
-            poster="/introduce.png"
+            // poster="/introduce.png"
           >
             Trình duyệt không hỗ trợ video.
           </video>

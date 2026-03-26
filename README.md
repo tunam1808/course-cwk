@@ -1,8 +1,9 @@
 # Tổng quan về dự án
 
-- Yo xin chào các con vợ, chào mừng chúng mày đã đến với trang web của team, nhưng mà trang web giờ chưa có một cái tính năng mẹ nào cả nên tao chưa biết mô tả cái đống code nào như nào
-- Hẹn chúng mày đến lúc nào tao hoàn thiện các tính năng cơ bản thì tao sẽ sửa mô tả này sau!
-- Còn bây giờ là cách chạy code nhé
+- Chào mừng các bạn đến với dự án của team, dự án này là tiền đề, là nền móng cho sự phát triển của team, hướng tới mục tiêu xa hơn là thành lập công ty riêng.
+- Sứ mệnh của dự án đối với người học đơn giản nó chỉ là cung cấp nền tảng học tập trực tuyến chất lượng, giúp mọi người tiếp cận kiến thức dễ dàng, linh hoạt và hiệu quả. Sứ mệnh đầy đủ thì sẽ được mô tả cụ thể trong website.
+- Sứ mệnh của dự án đối với team Cursed With Knowledge thì nó lớn lao lắm: dự án này là công sức của tất cả mọi thành viên, nó không chỉ gắn kết mọi người lại với nhau mà còn dạy mọi người cách làm việc nhóm sao cho hiệu quả, không phải dồn hết việc cho một người làm nữa vì tất cả đều hướng tới một mục tiêu chung.
+- Đội ngũ của chúng tôi: Phương, Văn Dương, Đại Dương, Xa, Trung Anh, Xa, Trang, Ngân, Như, Nam.
 
 ## Cách chạy code
 
@@ -23,5 +24,22 @@
 - index.css: style chính của toàn bộ dự án
 - main.tsx: xương sống của dự án
 - index.html: đương nhiên rồi, dự án mà ko có file html thì sao chạy đc
-- Còn những cái khác giải thích sau vì nó dài dòng vcl, tạm thời chỉ cần thế thôi
-- Anh Nam đẹp trai hơn vua
+- Còn những cái khác giải thích sau vì nó dài dòng lắm, tạm thời chỉ cần thế thôi
+
+#### Ngôn ngữ của dự án
+
+- Ngôn ngữ: Typescript
+- Thư viện Frontend: ReactJs
+- Thư viện Backend: NodeJs + Express
+- Framework: Tailwind CSS
+- Công cụ build: Vite
+- Trình quản lý gói (dùng để chạy server): Yarn
+- Hệ quản trị CSDL: MySQL Workbench
+- Công cụ truy vấn database: Prisma
+
+##### Nền tảng deploy
+
+- Frontend: Vercel
+- Backend: Railway
+- CSDL: Railway
+- Lưu trữ video: Bunny

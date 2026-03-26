@@ -183,7 +183,7 @@ export default function CoursesManage() {
       });
       setCourses(sorted);
     } catch {
-      showError("Không thể tải danh sách khóa học");
+      showError("Không thể tải danh sách các buổi học");
     } finally {
       setLoading(false);
     }
@@ -385,8 +385,8 @@ export default function CoursesManage() {
 
       showSuccess(
         editCourse
-          ? "Cập nhật khóa học thành công!"
-          : "Tạo khóa học thành công!",
+          ? "Cập nhật buổi học thành công!"
+          : "Tạo buổi học thành công!",
       );
       setShowModal(false);
       fetchCourses();
@@ -416,10 +416,10 @@ export default function CoursesManage() {
     if (!deleteId) return;
     try {
       await courseApi.deleteCourse(deleteId);
-      showSuccess("Xóa khóa học thành công!");
+      showSuccess("Xóa buổi học thành công!");
       fetchCourses();
     } catch {
-      showError("Xóa khóa học thất bại!");
+      showError("Xóa buổi học thất bại!");
     } finally {
       setDeleteId(null);
     }
@@ -504,7 +504,7 @@ export default function CoursesManage() {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-md">
             <h3 className="text-lg font-bold text-yellow-400 mb-4">
-              {editCourse ? "Sửa khóa học" : "Thêm buổi học mới"}
+              {editCourse ? "Sửa buổi học" : "Thêm buổi học mới"}
             </h3>
 
             <div className="space-y-4">
@@ -673,8 +673,8 @@ export default function CoursesManage() {
         open={showConfirm}
         onClose={() => setShowConfirm(false)}
         onConfirm={handleConfirmDelete}
-        title="Xác nhận xóa khóa học"
-        description="Bạn có chắc muốn xóa khóa học này không? Hành động này không thể hoàn tác."
+        title="Xác nhận xóa buổi học"
+        description="Bạn có chắc muốn xóa buổi học này không? Hành động này không thể hoàn tác."
       />
     </div>
   );

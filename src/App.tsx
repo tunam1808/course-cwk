@@ -2,6 +2,9 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import Home from "@/pages/home";
 import FreeCourses from "@/pages/free-courses";
+import FreeSources from "@/pages/free-sources";
+import VipSources from "@/pages/vip-sources";
+import Contact from "@/pages/contact";
 import ListCourses from "./pages/list-courses";
 import LessonCapcut from "./layout/courses-premium/course-capcut/lesson-capcut";
 import LessonBds from "./layout/courses-premium/course-bds/lesson-bds";
@@ -18,6 +21,9 @@ export default function App() {
       {/* User pages */}
       <Route path="/" element={<Home />} />
       <Route path="/free-courses" element={<FreeCourses />} />
+      <Route path="/free-sources" element={<FreeSources />} />
+      <Route path="/vip-sources" element={<VipSources />} />
+      <Route path="/contact" element={<Contact />} />
       <Route path="/login" element={<Login />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/list-courses" element={<ListCourses />} />

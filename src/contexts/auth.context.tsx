@@ -1,8 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useState,
-} from "react";
+import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +6,7 @@ interface User {
   id: number;
   email: string;
   role: string;
+  purchasedCategories: string[];
 }
 
 interface AuthContextType {
@@ -23,16 +20,15 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(() => {
-    // Đọc user từ storage khi khởi động
-    const stored =
-      localStorage.getItem("user") || sessionStorage.getItem("user");
+    const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
   });
 
-  const login = (user: User, token: string, rememberMe: boolean) => {
-    const storage = rememberMe ? localStorage : sessionStorage;
-    storage.setItem("token", token);
-    storage.setItem("user", JSON.stringify(user));
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const login = (user: User, token: string, _rememberMe: boolean) => {
+    // 👈 luôn dùng localStorage
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
     setUser(user);
   };
 
@@ -52,7 +48,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Hook dùng trong các component
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth phải dùng trong AuthProvider");
