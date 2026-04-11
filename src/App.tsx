@@ -12,6 +12,7 @@ import Login from "@/pages/login";
 import ManagePage from "@/admin/manage-page";
 import AccountManage from "@/admin/acount-manage";
 import CoursesManage from "@/admin/courses-manage";
+import IntroManage from "@/admin/intro-manage";
 import Profile from "@/pages/profile";
 
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
         <Route index element={<Navigate to="/manage-page/account" replace />} />
         <Route path="account" element={<AccountManage />} />
         <Route path="courses" element={<CoursesManage />} />
+        <Route path="intro-manage" element={<IntroManage />} />
       </Route>
 
       {/* 404 */}

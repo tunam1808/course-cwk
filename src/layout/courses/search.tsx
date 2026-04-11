@@ -15,19 +15,19 @@ export default function HeaderWithSearch() {
   };
 
   return (
-    <header className="bg-black ">
+    <header className="bg-black">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <form
           onSubmit={handleSearch}
-          className="flex rounded-lg overflow-hidden border-2 border-white bg-black shadow-lg shadow-yellow-900/10"
+          className="flex w-full max-w-full overflow-hidden rounded-lg border-2 border-white bg-black shadow-lg"
         >
-          {/* Danh mục */}
+          {/* Danh mục - ẩn trên mobile */}
           <button
             type="button"
-            className="px-5 py-3.5 bg-gray-800 hover:bg-gray-700 text-white font-medium flex items-center gap-2 transition-colors border-r border-gray-700"
+            className="hidden sm:flex px-4 py-3 lg:px-5 lg:py-3.5 bg-gray-800 hover:bg-gray-700 text-white font-medium items-center gap-2 transition-colors border-r border-gray-700 whitespace-nowrap text-sm lg:text-base"
           >
             Danh mục
-            <HiChevronDown className="w-5 h-5 opacity-80" />
+            <HiChevronDown className="w-4 h-4 lg:w-5 lg:h-5 opacity-80" />
           </button>
 
           {/* Input */}
@@ -35,17 +35,17 @@ export default function HeaderWithSearch() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tìm kiếm tài nguyên background, elements,..."
-            className="flex-1 px-5 py-3.5 bg-transparent text-white placeholder-gray-500 italic focus:outline-none text-base"
+            placeholder="Tìm kiếm tài nguyên..."
+            className="flex-1 min-w-0 px-3 py-3 sm:px-4 sm:py-3.5 lg:px-5 bg-transparent text-white placeholder-gray-500 italic focus:outline-none text-sm lg:text-base"
           />
 
           {/* Nút tìm kiếm */}
           <button
             type="submit"
-            className="px-6 py-3.5 bg-yellow-500 hover:bg-yellow-400 text-black font-bold flex items-center gap-2 transition-all duration-200"
+            className="px-4 py-3 sm:px-5 sm:py-3.5 lg:px-6 bg-yellow-500 hover:bg-yellow-400 text-black font-bold flex items-center gap-2 transition-all duration-200 whitespace-nowrap text-sm lg:text-base"
           >
-            <FaSearch className="w-5 h-5" />
-            Tìm kiếm
+            <FaSearch className="w-4 h-4 lg:w-5 lg:h-5" />
+            <span className="hidden sm:inline">Tìm kiếm</span>
           </button>
         </form>
       </div>

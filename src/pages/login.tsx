@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { authApi } from "../api/auth.api";
 import { useAuth } from "../contexts/auth.context";
 import { showError } from "@/common/toast";
@@ -7,6 +7,7 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,9 +24,10 @@ export default function Login() {
     try {
       const data = await authApi.login(email, password);
       login(data.user, data.token, rememberMe);
-      navigate("/");
-    } catch (err: any) {
-      showError(err.response?.data?.message || "Đăng nhập thất bại");
+      navigate(location.state?.from || "/");
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      showError(error.response?.data?.message || "Đăng nhập thất bại");
     } finally {
       setLoading(false);
     }
@@ -54,7 +56,6 @@ export default function Login() {
             />
           </div>
 
-          {/* 👈 Thêm icon hiển thị mật khẩu */}
           <div className="relative">
             <input
               id="password"

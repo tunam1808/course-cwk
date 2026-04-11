@@ -4,7 +4,6 @@ import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { LockClosedIcon } from "@heroicons/react/24/solid";
 
-// ✅ Sửa category khớp với enum Prisma
 const courses = [
   {
     id: "CAPCUT_AI",
@@ -29,72 +28,108 @@ export default function SelectCourses() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showLoginDialog, setShowLoginDialog] = useState(false);
-  const [showNoAccessDialog, setShowNoAccessDialog] = useState(false); // 👈 thêm dialog mới
+  const [showNoAccessDialog, setShowNoAccessDialog] = useState(false);
+
+  const handleClick = (course: (typeof courses)[0], hasAccess: boolean) => {
+    if (!user) {
+      setShowLoginDialog(true);
+      return;
+    }
+    if (!hasAccess) {
+      setShowNoAccessDialog(true);
+      return;
+    }
+    navigate(course.link);
+  };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="mb-10 text-center">
-          <p className="text-gray-400 text-base">
-            Chọn khóa học của bạn để bắt đầu học ngay
-          </p>
-        </div>
+    <div className=" bg-gray-950 text-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <p className="text-gray-400 text-sm text-center mb-8">
+          Chọn khóa học của bạn để bắt đầu học ngay
+        </p>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-5 lg:gap-6">
           {courses.map((course) => {
-            // ✅ Kiểm tra quyền truy cập từng khóa học
             const hasAccess =
               user?.role === "ADMIN" ||
-              user?.purchasedCategories?.includes(course.id);
+              user?.purchasedCategories?.includes(course.id) ||
+              false;
 
             return (
               <div
                 key={course.id}
-                onClick={() => {
-                  if (!user) {
-                    setShowLoginDialog(true);
-                    return;
-                  }
-                  if (!hasAccess) {
-                    setShowNoAccessDialog(true); // 👈 đã login nhưng chưa được cấp quyền
-                    return;
-                  }
-                  navigate(course.link);
-                }}
-                className="group relative w-full h-52 lg:h-64 rounded-2xl overflow-hidden cursor-pointer border-2 border-gray-800 hover:border-yellow-500 transition-all duration-300 shadow-lg hover:shadow-yellow-500/20"
+                onClick={() => handleClick(course, hasAccess)}
+                className="cursor-pointer"
               >
-                <img
-                  src={course.image}
-                  alt={course.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+                {/* ===== DESKTOP: UI cũ - ảnh nền + text đè lên ===== */}
+                <div className="hidden lg:block group relative w-full h-64 rounded-2xl overflow-hidden border-2 border-gray-800 hover:border-yellow-500 transition-all duration-300 shadow-lg hover:shadow-yellow-500/20">
+                  <img
+                    src={course.image}
+                    alt={course.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
 
-                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
+                  {(!user || !hasAccess) && (
+                    <div className="absolute top-4 right-4 bg-black/60 rounded-full p-2 border border-gray-600">
+                      <LockClosedIcon className="w-5 h-5 text-yellow-400" />
+                    </div>
+                  )}
 
-                {/* ✅ Hiện icon khóa khi chưa login HOẶC chưa được cấp quyền */}
-                {(!user || !hasAccess) && (
-                  <div className="absolute top-4 right-4 bg-black/60 rounded-full p-2 border border-gray-600">
-                    <LockClosedIcon className="w-5 h-5 text-yellow-400" />
+                  <div className="absolute inset-0 flex flex-col justify-center px-12">
+                    <p className="text-yellow-400 text-sm font-medium mb-2 uppercase tracking-wider">
+                      {course.lessons} + buổi học và sẽ cập nhật thêm
+                    </p>
+                    <h2 className="text-3xl font-bold text-white mb-3 leading-snug">
+                      {course.title}
+                    </h2>
+                    <p className="text-gray-300 text-base mb-5">
+                      {course.description}
+                    </p>
+                    <div>
+                      <span className="inline-flex items-center gap-2 px-5 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg text-sm transition-all group-hover:gap-3">
+                        {!user || !hasAccess
+                          ? "🔒 Chưa mở khóa"
+                          : "Vào học ngay →"}
+                      </span>
+                    </div>
                   </div>
-                )}
+                </div>
 
-                <div className="absolute inset-0 flex flex-col justify-center px-8 lg:px-12">
-                  <p className="text-yellow-400 text-sm font-medium mb-2 uppercase tracking-wider">
-                    {course.lessons} + buổi học và sẽ cập nhật thêm
-                  </p>
-                  <h2 className="text-2xl lg:text-3xl font-bold text-white mb-3 leading-snug">
-                    {course.title}
-                  </h2>
-                  <p className="text-gray-300 text-sm lg:text-base mb-5 hidden sm:block">
-                    {course.description}
-                  </p>
-                  <div>
-                    {/* ✅ Nút thay đổi theo trạng thái */}
-                    <span className="inline-flex items-center gap-2 px-5 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg text-sm transition-all group-hover:gap-3">
+                {/* ===== MOBILE: UI mới - ảnh trên, text dưới ===== */}
+                <div className="lg:hidden group rounded-2xl overflow-hidden border-2 border-gray-800 hover:border-yellow-500 transition-all duration-300 shadow-lg">
+                  <div className="relative w-full h-44 sm:h-56">
+                    <img
+                      src={course.image}
+                      alt={course.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+                    <div className="absolute top-3 left-3 bg-yellow-500 text-black text-xs font-black px-3 py-1 rounded-full uppercase tracking-wide">
+                      {course.lessons}+ buổi học
+                    </div>
+
+                    {(!user || !hasAccess) && (
+                      <div className="absolute top-3 right-3 bg-black/60 rounded-full p-2 border border-gray-600">
+                        <LockClosedIcon className="w-4 h-4 text-yellow-400" />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-gray-900 px-5 py-4 flex flex-col gap-3">
+                    <h2 className="text-base font-bold text-white leading-snug">
+                      {course.title}
+                    </h2>
+                    <p className="text-gray-400 text-sm leading-relaxed">
+                      {course.description}
+                    </p>
+                    <button className="w-full py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-black text-sm uppercase tracking-widest rounded-xl transition-all active:scale-95">
                       {!user || !hasAccess
                         ? "🔒 Chưa mở khóa"
                         : "Vào học ngay →"}
-                    </span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -140,7 +175,7 @@ export default function SelectCourses() {
         </Dialog.Portal>
       </Dialog.Root>
 
-      {/* 👇 Dialog chưa được cấp quyền */}
+      {/* Dialog chưa được cấp quyền */}
       <Dialog.Root
         open={showNoAccessDialog}
         onOpenChange={setShowNoAccessDialog}
