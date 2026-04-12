@@ -12,7 +12,7 @@ export function PrivateRoute() {
 export function AdminRoute() {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
-  if (user.role !== "ADMIN") return <Navigate to="/" replace />; // chữ hoa
+  if (user.role !== "ADMIN") return <Navigate to="/" replace />;
   return <Outlet />;
 }
 
