@@ -42,7 +42,7 @@ export default function HeaderWithSearch() {
           {/* Nút tìm kiếm */}
           <button
             type="submit"
-            className="px-4 py-3 sm:px-5 sm:py-3.5 lg:px-6 bg-yellow-500 hover:bg-yellow-400 text-black font-bold flex items-center gap-2 transition-all duration-200 whitespace-nowrap text-sm lg:text-base"
+            className="px-4 py-3 sm:px-5 sm:py-3.5 lg:px-6 bg-[#ffff00] hover:bg-yellow-400 text-black font-bold flex items-center gap-2 transition-all duration-200 whitespace-nowrap text-sm lg:text-base"
           >
             <FaSearch className="w-4 h-4 lg:w-5 lg:h-5" />
             <span className="hidden sm:inline">Tìm kiếm</span>

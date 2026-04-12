@@ -2,6 +2,17 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@font-face {
+  font-family: "UTM Avo";
+  src:
+    url("/fonts/UTM-Avo.woff2") format("woff2"),
+    url("/fonts/UTM-Avo.woff") format("woff"),
+    url("/fonts/UTM-Avo.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -123,6 +134,9 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+body {
+  font-family: "UTM Avo", sans-serif;
 }
 
 @layer base {

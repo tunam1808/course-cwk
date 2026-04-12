@@ -1,5 +1,12 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
+import ScrollToTop from "@/components/scroll-to-top";
+import {
+  PrivateRoute,
+  AdminRoute,
+  GuestRoute,
+} from "@/components/protected-route";
+
 import Home from "@/pages/home";
 import FreeCourses from "@/pages/free-courses";
 import FreeSources from "@/pages/free-sources";
@@ -13,43 +20,60 @@ import ManagePage from "@/admin/manage-page";
 import AccountManage from "@/admin/acount-manage";
 import CoursesManage from "@/admin/courses-manage";
 import IntroManage from "@/admin/intro-manage";
+import CountdownManage from "@/admin/countdown-manage";
 import Profile from "@/pages/profile";
 
 export default function App() {
   return (
-    // 👈 xóa <Router> wrapper
-    <Routes>
-      {/* User pages */}
-      <Route path="/" element={<Home />} />
-      <Route path="/free-courses" element={<FreeCourses />} />
-      <Route path="/free-sources" element={<FreeSources />} />
-      <Route path="/vip-sources" element={<VipSources />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/list-courses" element={<ListCourses />} />
-      <Route path="/lesson-capcut" element={<LessonCapcut />} />
-      <Route path="/lesson-bds" element={<LessonBds />} />
+    <>
+      <ScrollToTop />
+      <Routes>
+        {/* Public — ai cũng vào được */}
+        <Route path="/" element={<Home />} />
+        <Route path="/free-courses" element={<FreeCourses />} />
+        <Route path="/free-sources" element={<FreeSources />} />
+        <Route path="/contact" element={<Contact />} />
 
-      {/* Admin */}
-      <Route path="/manage-page" element={<ManagePage />}>
-        <Route index element={<Navigate to="/manage-page/account" replace />} />
-        <Route path="account" element={<AccountManage />} />
-        <Route path="courses" element={<CoursesManage />} />
-        <Route path="intro-manage" element={<IntroManage />} />
-      </Route>
+        {/* Guest only — chưa đăng nhập mới vào được */}
+        <Route element={<GuestRoute />}>
+          <Route path="/login" element={<Login />} />
+        </Route>
 
-      {/* 404 */}
-      <Route
-        path="*"
-        element={
-          <div className="min-h-screen flex items-center justify-center bg-black text-white">
-            <h1 className="text-6xl font-bold text-yellow-400">
-              404 - Tính năng đang phát triển
-            </h1>
-          </div>
-        }
-      />
-    </Routes>
+        {/* Private — phải đăng nhập */}
+        <Route element={<PrivateRoute />}>
+          <Route path="/vip-sources" element={<VipSources />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/list-courses" element={<ListCourses />} />
+          <Route path="/lesson-capcut" element={<LessonCapcut />} />
+          <Route path="/lesson-bds" element={<LessonBds />} />
+        </Route>
+
+        {/* Admin only */}
+        <Route element={<AdminRoute />}>
+          <Route path="/manage-page" element={<ManagePage />}>
+            <Route
+              index
+              element={<Navigate to="/manage-page/account" replace />}
+            />
+            <Route path="account" element={<AccountManage />} />
+            <Route path="courses" element={<CoursesManage />} />
+            <Route path="intro-manage" element={<IntroManage />} />
+            <Route path="countdown-manage" element={<CountdownManage />} />
+          </Route>
+        </Route>
+
+        {/* 404 */}
+        <Route
+          path="*"
+          element={
+            <div className="min-h-screen flex items-center justify-center bg-black text-white">
+              <h1 className="text-6xl font-bold text-yellow-400">
+                404 - Tính năng đang phát triển
+              </h1>
+            </div>
+          }
+        />
+      </Routes>
+    </>
   );
 }

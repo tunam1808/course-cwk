@@ -1,6 +1,12 @@
 // src/pages/admin/AdminDashboard.tsx
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { FiUsers, FiBookOpen, FiArrowLeft, FiLayout } from "react-icons/fi";
+import {
+  FiUsers,
+  FiBookOpen,
+  FiArrowLeft,
+  FiLayout,
+  FiClock,
+} from "react-icons/fi";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -70,7 +76,6 @@ export default function AdminDashboard() {
             Quản lý khóa học
           </NavLink>
 
-          {/* ✅ Thêm mới */}
           <NavLink
             to="/manage-page/intro-manage"
             className={({ isActive }) =>
@@ -84,6 +89,21 @@ export default function AdminDashboard() {
           >
             <FiLayout className="w-6 h-6" />
             Quản lý intro
+          </NavLink>
+
+          <NavLink
+            to="/manage-page/countdown-manage"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-3 rounded-lg transition-all
+    ${
+      isActive
+        ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/40"
+        : "text-gray-300 hover:bg-gray-800 hover:text-yellow-400"
+    }`
+            }
+          >
+            <FiClock className="w-6 h-6" />
+            Quản lý ưu đãi
           </NavLink>
         </aside>
 

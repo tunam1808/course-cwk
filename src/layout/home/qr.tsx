@@ -11,7 +11,7 @@ const steps = [
         <br />
         Ngân hàng : <span className="text-white">MB Bank</span>
         <br />
-        Chủ TK : <span className="text-white">Phụng Ngọc Phương</span>
+        Chủ TK : <span className="text-white">Phùng Ngọc Phương</span>
       </>
     ),
   },
@@ -33,7 +33,8 @@ const steps = [
 
 export default function PaymentSection() {
   return (
-    <>
+    // id="payment-section" để introduce.tsx có thể scroll đến
+    <div id="payment-section">
       {/* ==================== DESKTOP ==================== */}
       <div className="hidden md:block">
         <div className="max-w-[1150px] mx-auto px-4 md:px-6 my-6 mt-6">
@@ -81,7 +82,6 @@ export default function PaymentSection() {
               </div>
               <p className="text-center text-[30px] font-bold text-[#ffff00] italic mt-8 leading-relaxed">
                 Trợ lý sẽ kích hoạt khóa học và gửi toàn bộ Kho Tài Nguyên VIP
-                <br />
                 trị giá 2.5 triệu cho bạn trong vòng 1 phút
               </p>
             </div>
@@ -110,9 +110,8 @@ export default function PaymentSection() {
                 Hành động ngay - Đừng chần chừ thêm một giây nào nữa!
               </h2>
 
-              {/* ==================== MOBILE LAYOUT: QR Ở TRÊN - STEPS Ở DƯỚI ==================== */}
               <div className="flex flex-col gap-6">
-                {/* QR Code - Ở trên */}
+                {/* QR Code */}
                 <div className="flex items-center justify-center">
                   <div className="w-full max-w-[300px] aspect-square">
                     <img
@@ -123,7 +122,7 @@ export default function PaymentSection() {
                   </div>
                 </div>
 
-                {/* Các bước - Ở dưới */}
+                {/* Các bước */}
                 <div className="flex flex-col gap-4">
                   {steps.map((step, i) => (
                     <div key={i}>
@@ -140,12 +139,12 @@ export default function PaymentSection() {
 
               <p className="text-center text-[15px] font-bold text-[#ffff00] italic mt-8 leading-relaxed">
                 Trợ lý sẽ kích hoạt khóa học và gửi toàn bộ Kho Tài Nguyên VIP
-                trị giá 2.5 triệu cho bạn<br></br> trong vòng 1 phút
+                trị giá 2.5 triệu cho bạn trong vòng 1 phút
               </p>
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

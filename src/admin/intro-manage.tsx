@@ -16,7 +16,7 @@ import {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Intro {
-  slot: 1 | 2 | 3;
+  slot: 1 | 2 | 3 | 4 | 5 | 6;
   videoId: string | null;
   createdAt?: string;
   updatedAt?: string;
@@ -72,10 +72,15 @@ export default function ManageIntro() {
     initSlot(),
     initSlot(),
     initSlot(),
+    initSlot(),
+    initSlot(),
+    initSlot(),
   ]);
 
   const [showConfirm, setShowConfirm] = useState(false);
-  const [slotToDelete, setSlotToDelete] = useState<1 | 2 | 3 | null>(null);
+  const [slotToDelete, setSlotToDelete] = useState<
+    1 | 2 | 3 | 4 | 5 | 6 | null
+  >(null);
 
   const fileRefs = useRef<(HTMLInputElement | null)[]>([]);
   const tusRef = useRef<tus.Upload | null>(null);
@@ -87,7 +92,7 @@ export default function ManageIntro() {
     try {
       const data = await introApi.getIntro();
       const list: Intro[] = Array.isArray(data) ? (data as Intro[]) : [];
-      const formatted: Intro[] = ([1, 2, 3] as const).map(
+      const formatted: Intro[] = ([1, 2, 3, 4, 5, 6] as const).map(
         (slot) => list.find((i) => i?.slot === slot) || { slot, videoId: null },
       );
       setIntros(formatted);
@@ -150,7 +155,7 @@ export default function ManageIntro() {
   };
 
   // ─── Upload 1 slot ───────────────────────────────────────────────────────────
-  const uploadSlot = async (slotNumber: 1 | 2 | 3, file: File) => {
+  const uploadSlot = async (slotNumber: 1 | 2 | 3 | 4 | 5 | 6, file: File) => {
     const index = slotNumber - 1;
     patchSlot(index, { status: "uploading", progress: 0, error: "" });
 
@@ -205,11 +210,11 @@ export default function ManageIntro() {
   // ─── Upload tuần tự ──────────────────────────────────────────────────────────
   const handleUploadAll = async () => {
     setIsRunning(true);
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 6; i++) {
       const { file, status } = slots[i];
       if (!file || status === "done") continue;
       try {
-        await uploadSlot((i + 1) as 1 | 2 | 3, file);
+        await uploadSlot((i + 1) as 1 | 2 | 3 | 4 | 5 | 6, file);
       } catch {
         // Tiếp tục slot tiếp theo khi slot này lỗi
       }
@@ -219,7 +224,7 @@ export default function ManageIntro() {
   };
 
   // ─── Xóa intro ───────────────────────────────────────────────────────────────
-  const handleDelete = (slot: 1 | 2 | 3) => {
+  const handleDelete = (slot: 1 | 2 | 3 | 4 | 5 | 6) => {
     setSlotToDelete(slot);
     setShowConfirm(true);
   };
@@ -252,7 +257,7 @@ export default function ManageIntro() {
         </h2>
         <p className="mt-1 text-sm text-gray-400">
           Chọn video cho từng slot, sau đó bấm "Tải lên tất cả" để upload tuần
-          tự Video 1 → 2 → 3.
+          tự Video 1 → 2 → 3 → 4 → 5 → 6.
         </p>
       </div>
 
@@ -270,15 +275,15 @@ export default function ManageIntro() {
         </div>
       )}
 
-      {/* 3 Slot Cards */}
+      {/* 6 Slot Cards */}
       {loading ? (
         <div className="flex items-center gap-2 text-gray-500 text-sm py-8">
           <FiLoader className="animate-spin w-5 h-5" />
           Đang tải dữ liệu...
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {([1, 2, 3] as const).map((slotNumber) => {
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+          {([1, 2, 3, 4, 5, 6] as const).map((slotNumber) => {
             const index = slotNumber - 1;
             const slotState = slots[index];
             const currentIntro = intros.find((i) => i.slot === slotNumber);
@@ -531,7 +536,8 @@ export default function ManageIntro() {
 
           {!isRunning && (
             <p className="text-xs text-gray-500">
-              Upload tuần tự: Video 1 → Video 2 → Video 3
+              Upload tuần tự: Video 1 → Video 2 → Video 3 → Video 4 → Video 5 →
+              Video 6
             </p>
           )}
         </div>

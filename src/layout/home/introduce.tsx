@@ -3,7 +3,7 @@ import { introApi } from "@/api/intro.api";
 
 // ==================== TYPES ====================
 interface IntroSlot {
-  slot: 1 | 2 | 3;
+  slot: 1 | 2 | 3 | 4 | 5 | 6;
   videoId: string | null;
   createdAt: string | null;
   updatedAt: string | null;
@@ -80,9 +80,12 @@ function CheckIcon() {
   );
 }
 
-function CtaButton({ text }: { text: string }) {
+function CtaButton({ text, onClick }: { text: string; onClick?: () => void }) {
   return (
-    <button className="w-full md:w-220 mx-auto rounded-2xl block bg-[#ffff00] hover:bg-yellow-300 text-black font-black text-xl md:text-xl uppercase tracking-wide py-4 px-6 rounded transition-colors duration-150">
+    <button
+      onClick={onClick}
+      className="w-full md:w-220 mx-auto rounded-2xl block bg-[#ffff00] hover:bg-yellow-300 text-black font-black text-xl md:text-xl uppercase tracking-wide py-4 px-6 rounded transition-colors duration-150"
+    >
       {text}
     </button>
   );
@@ -122,8 +125,6 @@ function VideoSlot({
   loading: boolean;
 }) {
   const [activatedVideoId, setActivatedVideoId] = useState<string | null>(null);
-  // Derived: chỉ coi là activated nếu videoId hiện tại khớp với lúc user bấm play
-  // → tự động reset khi videoId đổi, không cần useEffect
   const activated = activatedVideoId === videoId && videoId !== null;
 
   return (
@@ -171,17 +172,6 @@ function VideoSlot({
 }
 
 // ==================== MOBILE RESULTS SECTION ====================
-/*
-  Giải pháp dứt điểm cho vấn đề iframe chặn touch trên mobile:
-
-  THAY VÌ: carousel scroll ngang bọc quanh iframe
-           → iframe chiếm toàn bộ không gian → chặn mọi touch kể cả nút bên ngoài
-
-  DÙNG: tab switcher — nút ‹ 1 2 3 › nằm NGOÀI và DƯỚI iframe hoàn toàn
-         → iframe không overlap với bất kỳ element tương tác nào
-         → mọi touch trong iframe đều đến đúng Bunny player
-         → nút chuyển video nằm riêng ở dưới, không bị chặn
-*/
 function MobileResultsSection({
   intros,
   loading,
@@ -189,10 +179,10 @@ function MobileResultsSection({
   intros: IntroSlot[];
   loading: boolean;
 }) {
-  const [activeSlot, setActiveSlot] = useState<1 | 2 | 3>(1);
+  const [activeSlot, setActiveSlot] = useState<1 | 2 | 3 | 4 | 5 | 6>(1);
   const [activated, setActivated] = useState(false);
 
-  const slots: (1 | 2 | 3)[] = [1, 2, 3];
+  const slots: (1 | 2 | 3 | 4 | 5 | 6)[] = [1, 2, 3, 4, 5, 6];
 
   const currentIntro = intros.find((i) => i.slot === activeSlot);
   const videoId = currentIntro?.videoId ?? null;
@@ -202,7 +192,9 @@ function MobileResultsSection({
       "[MobileResults] goLeft — slot " + activeSlot + " → reset activated",
     );
     setActivated(false);
-    setActiveSlot((prev) => (prev === 1 ? 3 : ((prev - 1) as 1 | 2 | 3)));
+    setActiveSlot((prev) =>
+      prev === 1 ? 6 : ((prev - 1) as 1 | 2 | 3 | 4 | 5 | 6),
+    );
   }
 
   function goRight() {
@@ -210,7 +202,9 @@ function MobileResultsSection({
       "[MobileResults] goRight — slot " + activeSlot + " → reset activated",
     );
     setActivated(false);
-    setActiveSlot((prev) => (prev === 3 ? 1 : ((prev + 1) as 1 | 2 | 3)));
+    setActiveSlot((prev) =>
+      prev === 6 ? 1 : ((prev + 1) as 1 | 2 | 3 | 4 | 5 | 6),
+    );
   }
 
   return (
@@ -232,7 +226,6 @@ function MobileResultsSection({
           </div>
         ) : videoId ? (
           activated ? (
-            // iframe KHÔNG bị đè bởi bất kỳ element nào → mọi touch hoạt động bình thường
             <iframe
               src={getBunnyEmbedUrl(videoId)}
               className="absolute inset-0 w-full h-full"
@@ -348,6 +341,9 @@ export default function CourseLandingPage() {
           { slot: 1, videoId: null, createdAt: null, updatedAt: null },
           { slot: 2, videoId: null, createdAt: null, updatedAt: null },
           { slot: 3, videoId: null, createdAt: null, updatedAt: null },
+          { slot: 4, videoId: null, createdAt: null, updatedAt: null },
+          { slot: 5, videoId: null, createdAt: null, updatedAt: null },
+          { slot: 6, videoId: null, createdAt: null, updatedAt: null },
         ]);
       })
       .finally(() => setLoading(false));
@@ -357,22 +353,32 @@ export default function CourseLandingPage() {
     return intros.find((i) => i.slot === slot);
   }
 
+  function scrollToPayment() {
+    const el = document.getElementById("payment-section");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
   return (
-    <div className="bg-black text-white min-h-screen font-sans">
+    <div className="bg-black text-white min-h-screen">
       <div className="max-w-[1150px] mx-auto px-4 md:px-6">
         {/* ==================== DESKTOP ==================== */}
         <div className="hidden md:block">
           <section className="px-6 py-6 text-center">
             <h1 className="text-4xl md:text-5xl font-black text-[#ffff00] uppercase leading-tight mb-6">
-              Thành thạo edit video tiktok
+              7 ngày thành thạo edit video tiktok
             </h1>
             <p className="text-base md:text-xl text-gray-400 leading-relaxed max-w-6xl mx-auto">
               Xem hàng chục video hướng dẫn edit... nhưng càng xem càng rối,
               càng mất thời gian và vẫn không biết bắt đầu từ đâu. Khóa học này
               là dành cho bạn.
             </p>
-            <div className="mt-10">
-              <CtaButton text="Đăng ký học & nhận tài nguyên ngay" />
+            <div className="mt-10 cursor-pointer">
+              <CtaButton
+                text="Đăng ký học & nhận tài nguyên ngay"
+                onClick={scrollToPayment}
+              />
             </div>
           </section>
 
@@ -455,7 +461,7 @@ export default function CourseLandingPage() {
                 của các học viên
               </p>
               <div className="grid grid-cols-3 gap-4">
-                {[1, 2, 3].map((slot) => {
+                {[1, 2, 3, 4, 5, 6].map((slot) => {
                   const intro = getIntroBySlot(slot);
                   return (
                     <div
@@ -474,8 +480,11 @@ export default function CourseLandingPage() {
             </section>
           </GradientBorderSection>
 
-          <section className="px-6 py-4">
-            <CtaButton text="Đăng ký học & nhận tài nguyên ngay" />
+          <section className="px-6 py-4 cursor-pointer">
+            <CtaButton
+              text="Đăng ký học & nhận tài nguyên ngay"
+              onClick={scrollToPayment}
+            />
           </section>
         </div>
 
@@ -483,15 +492,18 @@ export default function CourseLandingPage() {
         <div className="md:hidden">
           <section className="px-4 py-4 text-center">
             <h1 className="text-3xl font-black text-[#ffff00] uppercase leading-tight mb-2">
-              Thành thạo edit video tiktok
+              7 ngày thành thạo edit video tiktok
             </h1>
             <p className="text-base text-gray-400 leading-relaxed">
               Xem hàng chục video hướng dẫn edit... nhưng càng xem càng rối,
               càng mất thời gian và vẫn không biết bắt đầu từ đâu. Khóa học này
               là dành cho bạn.
             </p>
-            <div className="mt-8">
-              <CtaButton text="Đăng ký học & nhận tài nguyên ngay" />
+            <div className="mt-8 ">
+              <CtaButton
+                text="Đăng ký học & nhận tài nguyên ngay"
+                onClick={scrollToPayment}
+              />
             </div>
           </section>
 
@@ -504,7 +516,7 @@ export default function CourseLandingPage() {
                 {painPoints.map((point, i) => (
                   <li
                     key={i}
-                    className="flex items-center gap-4 text-base text-gray-300 leading-relaxed"
+                    className="flex items-center gap-4 text-base italic text-gray-300 leading-relaxed"
                   >
                     <XIcon />
                     <span>{point}</span>
@@ -563,7 +575,10 @@ export default function CourseLandingPage() {
           </GradientBorderSection>
 
           <section className="px-4 py-4">
-            <CtaButton text="Đăng ký học & nhận tài nguyên ngay" />
+            <CtaButton
+              text="Đăng ký học & nhận tài nguyên ngay"
+              onClick={scrollToPayment}
+            />
           </section>
         </div>
       </div>

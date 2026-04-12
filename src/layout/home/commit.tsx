@@ -25,9 +25,10 @@ function CheckIcon() {
   );
 }
 
-function CtaButton({ text }: { text: string }) {
+function CtaButton({ text, onClick }: { text: string; onClick?: () => void }) {
   return (
     <button
+      onClick={onClick}
       className="w-full md:w-220 mx-auto rounded-2xl block 
                  bg-[#ffff00] hover:bg-yellow-300 
                  text-black font-black 
@@ -43,20 +44,27 @@ function CtaButton({ text }: { text: string }) {
 
 // ==================== MAIN COMPONENT ====================
 export default function CommitSection() {
+  function scrollToPayment() {
+    const el = document.getElementById("payment-section");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
   return (
     <>
       {/* ==================== DESKTOP VERSION ==================== */}
       <div className="hidden md:block">
         <div className="max-w-[1150px] mx-auto px-4 md:px-6 my-6 mt-10">
           <div
-            className=" border-transparent rounded-2xl p-[10px]"
+            className="border-transparent rounded-2xl p-[10px]"
             style={{
               background:
                 "linear-gradient(to right, #1d1d1d, #1d1d1d, #203756, #1d3e5d)",
             }}
           >
             <div
-              className="border border-white rounded-xl px-25 py-10" // Desktop dài như cũ
+              className="border border-white rounded-xl px-25 py-10"
               style={{
                 background:
                   "linear-gradient(to right, #1d1d1d, #1d1d1d, #203756, #1d3e5d)",
@@ -73,7 +81,7 @@ export default function CommitSection() {
                     <div className="pt-0.5">
                       {item.highlightFirst ? (
                         <>
-                          <p className="pl-7 text-xl text-[#ffff00] italic leading-relaxed ">
+                          <p className="pl-7 text-xl text-[#ffff00] italic leading-relaxed">
                             {item.main}
                           </p>
                           <p className="pl-7 text-xl text-gray-300 italic leading-relaxed mt-0.5">
@@ -84,7 +92,7 @@ export default function CommitSection() {
                         <>
                           <p className="pl-7 text-xl text-gray-300 italic leading-relaxed">
                             {item.before}
-                            <span className="text-[#ffff00] ">
+                            <span className="text-[#ffff00]">
                               {item.highlight}
                             </span>
                           </p>
@@ -108,8 +116,11 @@ export default function CommitSection() {
               </ul>
             </div>
           </div>
-          <section className="px-6 py-4 mt-6">
-            <CtaButton text="Đăng ký học & nhận tài nguyên ngay" />
+          <section className="px-6 py-4 mt-6 cursor-pointer">
+            <CtaButton
+              text="Đăng ký học & nhận tài nguyên ngay"
+              onClick={scrollToPayment}
+            />
           </section>
         </div>
       </div>
@@ -118,14 +129,14 @@ export default function CommitSection() {
       <div className="md:hidden">
         <div className="max-w-[1150px] mx-auto px-4 md:px-6 my-6">
           <div
-            className=" border-transparent rounded-2xl p-[10px]"
+            className="border-transparent rounded-2xl p-[10px]"
             style={{
               background:
                 "linear-gradient(to right, #1d1d1d, #1d1d1d, #203756, #1d3e5d)",
             }}
           >
             <div
-              className="border border-white rounded-xl px-6 py-8" // Mobile gọn hơn
+              className="border border-white rounded-xl px-6 py-8"
               style={{
                 background:
                   "linear-gradient(to right, #1d1d1d, #1d1d1d, #203756, #1d3e5d)",
@@ -153,7 +164,7 @@ export default function CommitSection() {
                         <>
                           <p className="text-base text-gray-300 italic leading-relaxed">
                             {item.before}
-                            <span className="text-[#ffff00] ">
+                            <span className="text-[#ffff00]">
                               {item.highlight}
                             </span>
                           </p>
@@ -166,7 +177,7 @@ export default function CommitSection() {
                           <p className="text-base text-gray-300 italic leading-relaxed">
                             {item.sub}
                           </p>
-                          <p className="text-base text-[#ffff00] italic leading-relaxed  mt-0.5">
+                          <p className="text-base text-[#ffff00] italic leading-relaxed mt-0.5">
                             {item.main}
                           </p>
                         </>
@@ -178,8 +189,11 @@ export default function CommitSection() {
             </div>
           </div>
         </div>
-        <section className="px-4 py-4">
-          <CtaButton text="Đăng ký học & nhận tài nguyên ngay" />
+        <section className="px-4 py-4 cursor-pointer">
+          <CtaButton
+            text="Đăng ký học & nhận tài nguyên ngay"
+            onClick={scrollToPayment}
+          />
         </section>
       </div>
     </>
