@@ -10,6 +10,7 @@ import Countdown from "@/layout/home/countdown";
 import SourceMobile from "@/layout/home/source-mobile";
 import StoryMobile from "@/layout/home/story-mobile";
 import QR from "@/layout/home/qr";
+import Lucky from "@/layout/home/lucky-number";
 
 export default function Home() {
   return (
@@ -42,6 +43,7 @@ export default function Home() {
       <Offers />
       <Countdown />
       <QR />
+      <Lucky />
     </div>
   );
 }

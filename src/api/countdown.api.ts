@@ -16,6 +16,10 @@ export type CountdownState = {
   durationMs: number | null;
 };
 
+export type LuckyState = {
+  showLuckyNumber: boolean;
+};
+
 export const countdownApi = {
   getCountdown: async (): Promise<CountdownState> => {
     const response = await axios.get(`${BASE_URL}/countdown`);
@@ -26,8 +30,22 @@ export const countdownApi = {
     active: boolean;
     visible: boolean;
     durationMs: number | null;
-    resetTimer?: boolean; // ← thêm
+    resetTimer?: boolean;
   }): Promise<void> => {
     await axios.put(`${BASE_URL}/countdown`, data, authHeader());
+  },
+
+  // ─── Lucky Number ───────────────────────────────────────────────────────────
+  getLuckySetting: async (): Promise<LuckyState> => {
+    const response = await axios.get(`${BASE_URL}/countdown/lucky`);
+    return response.data;
+  },
+
+  updateLuckySetting: async (showLuckyNumber: boolean): Promise<void> => {
+    await axios.put(
+      `${BASE_URL}/countdown/lucky`,
+      { showLuckyNumber },
+      authHeader(),
+    );
   },
 };
