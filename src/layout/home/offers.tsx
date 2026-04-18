@@ -8,7 +8,9 @@ const pricingItems = [
   { label: "Hỗ trợ 24/7 mọi vấn đề", price: null },
 ];
 
-const NOTIFICATIONS = BUYER_NAMES.map((name) => `${name} đã mua khóa học`);
+const NOTIFICATIONS = [...BUYER_NAMES]
+  .sort(() => Math.random() - 0.5)
+  .map((name) => `${name} đã mua khóa học`);
 
 // ─── Purchase Notification ────────────────────────────────────────────────────
 function PurchaseNotification({

@@ -426,7 +426,7 @@ export default function CourseLandingPage() {
                   </li>
                 ))}
               </ul>
-              <div className="text-center text-3xl text-gray-300 leading-relaxed italic">
+              <div className="text-center text-[28px] text-gray-300 leading-relaxed italic">
                 <p className="font-bold">
                   Bạn không thiếu cố gắng, bạn chỉ đang thiếu{" "}
                   <span className="text-[#ffff00] font-bold">
