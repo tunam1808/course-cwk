@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { CheckCircleIcon, PlayIcon } from "@heroicons/react/24/solid";
 import { courseApi } from "@/api/course.api";
 import { progressApi } from "@/api/progress.api";
@@ -26,6 +26,8 @@ export default function CoursePlayer() {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [marking, setMarking] = useState(false);
+
+  const videoRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,6 +66,19 @@ export default function CoursePlayer() {
   const isCompleted = currentLesson
     ? completedIds.includes(currentLesson.id)
     : false;
+
+  const handleSelectLesson = (lesson: Course) => {
+    setCurrentLesson(lesson);
+    // Chỉ scroll trên mobile (< 1024px = breakpoint lg)
+    if (window.innerWidth < 1024 && videoRef.current) {
+      setTimeout(() => {
+        videoRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 50);
+    }
+  };
 
   const handleToggleComplete = async () => {
     if (!currentLesson || !user) return;
@@ -132,7 +147,7 @@ export default function CoursePlayer() {
                     return (
                       <li
                         key={lesson.id}
-                        onClick={() => setCurrentLesson(lesson)}
+                        onClick={() => handleSelectLesson(lesson)}
                         className={`px-5 py-4 flex items-center justify-between cursor-pointer transition-colors
                           ${
                             isCurrent
@@ -168,7 +183,10 @@ export default function CoursePlayer() {
             </aside>
 
             {/* Phần chính - Video player */}
-            <main className="flex-1 flex flex-col bg-gray-900 rounded-xl border-2 border-white overflow-hidden shadow-lg shadow-black/30">
+            <main
+              ref={videoRef}
+              className="flex-1 flex flex-col bg-gray-900 rounded-xl border-2 border-white overflow-hidden shadow-lg shadow-black/30"
+            >
               {/* Header buổi học */}
               <div className="p-5 lg:p-6 border-b border-gray-800 bg-gray-900/80">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -225,7 +243,7 @@ export default function CoursePlayer() {
               <div className="p-5 lg:p-6 border-t border-gray-800 bg-gray-900 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <button
                   disabled={currentIndex <= 0}
-                  onClick={() => setCurrentLesson(lessons[currentIndex - 1])}
+                  onClick={() => handleSelectLesson(lessons[currentIndex - 1])}
                   className="px-6 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-black rounded-lg font-medium flex items-center gap-2 transition-all w-full sm:w-auto disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   ← Bài trước
@@ -237,7 +255,7 @@ export default function CoursePlayer() {
 
                 <button
                   disabled={currentIndex >= lessons.length - 1}
-                  onClick={() => setCurrentLesson(lessons[currentIndex + 1])}
+                  onClick={() => handleSelectLesson(lessons[currentIndex + 1])}
                   className="px-8 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-black rounded-lg font-medium flex items-center gap-2 transition-all w-full sm:w-auto disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Bài sau →
