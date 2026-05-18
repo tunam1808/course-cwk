@@ -9,7 +9,6 @@ import {
 
 import Home from "@/pages/home";
 import FreeCourses from "@/pages/free-courses";
-import FreeSources from "@/pages/free-sources";
 import VipSources from "@/pages/vip-sources";
 import Contact from "@/pages/contact";
 import ListCourses from "./pages/list-courses";
@@ -21,6 +20,7 @@ import AccountManage from "@/admin/acount-manage";
 import CoursesManage from "@/admin/courses-manage";
 import IntroManage from "@/admin/intro-manage";
 import CountdownManage from "@/admin/countdown-manage";
+import ResourceManage from "@/admin/resource-manage";
 import Profile from "@/pages/profile";
 
 export default function App() {
@@ -31,7 +31,7 @@ export default function App() {
         {/* Public — ai cũng vào được */}
         <Route path="/" element={<Home />} />
         <Route path="/free-courses" element={<FreeCourses />} />
-        <Route path="/free-sources" element={<FreeSources />} />
+        <Route path="/vip-sources" element={<VipSources />} />
         <Route path="/contact" element={<Contact />} />
 
         {/* Guest only — chưa đăng nhập mới vào được */}
@@ -41,7 +41,6 @@ export default function App() {
 
         {/* Private — phải đăng nhập */}
         <Route element={<PrivateRoute />}>
-          <Route path="/vip-sources" element={<VipSources />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/list-courses" element={<ListCourses />} />
           <Route path="/lesson-capcut" element={<LessonCapcut />} />
@@ -59,6 +58,7 @@ export default function App() {
             <Route path="courses" element={<CoursesManage />} />
             <Route path="intro-manage" element={<IntroManage />} />
             <Route path="countdown-manage" element={<CountdownManage />} />
+            <Route path="resource-manage" element={<ResourceManage />} />
           </Route>
         </Route>
 

@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "@/default/header";
 import Search from "@/layout/courses/search";
 import IntroduceDestop from "@/layout/home/introduce";
@@ -13,6 +15,17 @@ import QR from "@/layout/home/qr";
 import Lucky from "@/layout/home/lucky-number";
 
 export default function Home() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.scrollTo) {
+      const el = document.getElementById(location.state.scrollTo);
+      if (el) {
+        setTimeout(() => el.scrollIntoView({ behavior: "smooth" }), 100);
+      }
+    }
+  }, [location.state]);
+
   return (
     <div className="min-h-screen bg-black flex flex-col">
       <Header />
@@ -20,29 +33,23 @@ export default function Home() {
       <IntroduceDestop />
       <Feedback />
       <div className="block md:hidden">
-        {" "}
-        {/* Hiện component này khi ở giao diện mobile */}
         <SourceMobile />
       </div>
       <div className="hidden md:block">
-        {" "}
-        {/* Ẩn component này khi ở giao diện mobile */}
         <Source />
       </div>
       <Commit />
       <div className="block md:hidden">
-        {" "}
-        {/* Hiện component này khi ở giao diện mobile */}
         <StoryMobile />
       </div>
       <div className="hidden md:block">
-        {" "}
-        {/* Ẩn component này khi ở giao diện mobile */}
         <Story />
       </div>
       <Offers />
       <Countdown />
-      <QR />
+      <div id="qr">
+        <QR />
+      </div>
       <Lucky />
     </div>
   );

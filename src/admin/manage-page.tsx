@@ -6,6 +6,7 @@ import {
   FiArrowLeft,
   FiLayout,
   FiClock,
+  FiFolder,
 } from "react-icons/fi";
 
 export default function AdminDashboard() {
@@ -95,15 +96,30 @@ export default function AdminDashboard() {
             to="/manage-page/countdown-manage"
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-lg transition-all
-    ${
-      isActive
-        ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/40"
-        : "text-gray-300 hover:bg-gray-800 hover:text-yellow-400"
-    }`
+              ${
+                isActive
+                  ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/40"
+                  : "text-gray-300 hover:bg-gray-800 hover:text-yellow-400"
+              }`
             }
           >
             <FiClock className="w-6 h-6" />
             Quản lý ưu đãi
+          </NavLink>
+
+          <NavLink
+            to="/manage-page/resource-manage"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-3 rounded-lg transition-all
+              ${
+                isActive
+                  ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/40"
+                  : "text-gray-300 hover:bg-gray-800 hover:text-yellow-400"
+              }`
+            }
+          >
+            <FiFolder className="w-6 h-6" />
+            Quản lý tài nguyên
           </NavLink>
         </aside>
 

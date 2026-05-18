@@ -1,6 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "@/contexts/auth.context"; // đổi đường dẫn cho đúng
-
+import { useAuth } from "@/contexts/auth.context";
 // Chỉ cho vào nếu đã đăng nhập
 export function PrivateRoute() {
   const { user } = useAuth();

@@ -108,12 +108,19 @@ export default function Login() {
             {loading ? "Đang đăng nhập..." : "Đăng nhập"}
           </button>
 
-          <div className="flex justify-center">
+          {/* ✅ Hủy đăng nhập + Đăng ký tài khoản */}
+          <div className="flex items-center justify-between">
             <span
               onClick={() => navigate(-1)}
               className="text-sm text-gray-400 hover:text-gray-300 cursor-pointer transition-colors"
             >
               Hủy đăng nhập
+            </span>
+            <span
+              onClick={() => navigate("/", { state: { scrollTo: "qr" } })}
+              className="text-sm text-yellow-400 hover:text-yellow-300 cursor-pointer transition-colors font-medium"
+            >
+              Đăng ký tài khoản
             </span>
           </div>
         </form>

@@ -6,8 +6,7 @@ const navItems = [
   { label: "Trang chủ", href: "/" },
   { label: "Học miễn phí", href: "/free-courses" },
   { label: "Các khóa học", href: "/list-courses" },
-  { label: "Tài nguyên VIP", href: "/vip-sources" },
-  { label: "Tài nguyên free", href: "/free-sources" },
+  { label: "Tài nguyên", href: "/vip-sources" },
   { label: "Liên hệ", href: "/contact" },
 ] as const;
 
