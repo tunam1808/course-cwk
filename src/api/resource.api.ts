@@ -64,13 +64,17 @@ export interface Pagination {
 export const resourcePublicApi = {
   /** Lấy tất cả category kể cả VIP (public, không cần auth) */
   getAllCategories: async (): Promise<ResourceCategory[]> => {
-    const res = await axios.get(`${BASE_URL}/resource-categories/all`);
+    const res = await axios.get(`${BASE_URL}/resource-categories/all`, {
+      headers: authHeader(),
+    });
     return res.data.data;
   },
 
   /** Lấy toàn bộ cây folder cấp 1 + 2 (chỉ FREE) */
   getCategories: async (): Promise<ResourceCategory[]> => {
-    const res = await axios.get(`${BASE_URL}/resource-categories`);
+    const res = await axios.get(`${BASE_URL}/resource-categories`, {
+      headers: authHeader(),
+    });
     return res.data.data;
   },
 
@@ -81,6 +85,7 @@ export const resourcePublicApi = {
     limit = 30,
   ): Promise<{ items: ResourceFile[]; pagination: Pagination }> => {
     const res = await axios.get(`${BASE_URL}/resource-files`, {
+      headers: authHeader(),
       params: { subFolderId, page, limit },
     });
     return res.data.data;
@@ -88,7 +93,11 @@ export const resourcePublicApi = {
 
   /** Đếm lượt tải (gọi trước khi redirect download) */
   trackDownload: async (fileId: number): Promise<void> => {
-    await axios.post(`${BASE_URL}/resource-files/${fileId}/download`);
+    await axios.post(
+      `${BASE_URL}/resource-files/${fileId}/download`,
+      {},
+      { headers: authHeader() },
+    );
   },
 };
 
