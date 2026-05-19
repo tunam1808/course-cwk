@@ -42,12 +42,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   CAPCUT_AI: "Edit video CapCut nâng cao + AI",
   BAT_DONG_SAN: "Bất động sản",
   MIEN_PHI: "Miễn phí",
+  MOBILE: "Mobile",
 };
 
 const CATEGORY_ORDER: Record<string, number> = {
   CAPCUT_AI: 0,
   BAT_DONG_SAN: 1,
   MIEN_PHI: 2,
+  MOBILE: 3,
 };
 
 // Component row có thể kéo thả
@@ -531,6 +533,7 @@ export default function CoursesManage() {
                 </option>
                 <option value="BAT_DONG_SAN">Bất động sản</option>
                 <option value="MIEN_PHI">Miễn phí</option>
+                <option value="MOBILE">Mobile</option>
               </select>
 
               <div

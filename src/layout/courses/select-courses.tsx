@@ -7,20 +7,30 @@ import { LockClosedIcon } from "@heroicons/react/24/solid";
 const courses = [
   {
     id: "CAPCUT_AI",
-    title: "Khóa edit video CapCut nâng cao + AI",
+    title: "Thành thạo CapCut & AI để tạo video triệu view",
     description:
-      "Học cách edit video chuyên nghiệp với CapCut và các công cụ AI hiện đại",
+      "Làm chủ CapCut nâng cao và công cụ AI hiện đại để edit video chuyên nghiệp, viral và cuốn hút người xem",
     image: "/capcut.jpg",
     lessons: 40,
     link: "/lesson-capcut",
   },
   {
     id: "BAT_DONG_SAN",
-    title: "Khóa học edit video bất động sản",
-    description: "Kỹ thuật quay và dựng video bất động sản thu hút khách hàng",
+    title: "Thành thạo edit video bất động sản chuyên nghiệp",
+    description:
+      "Học kỹ thuật quay dựng video bất động sản đẳng cấp, tăng độ uy tín và thu hút khách hàng hiệu quả",
     image: "/batdongsan.jpg",
     lessons: 30,
     link: "/lesson-bds",
+  },
+  {
+    id: "MOBILE",
+    title: "Thành thạo edit video Capcut Mobile tất tần tật từ A-Z",
+    description:
+      "Biến điện thoại thành studio di động, học edit video chuyên nghiệp từ cơ bản đến nâng cao ngay trên điện thoại",
+    image: "/mobile.jpg",
+    lessons: 20,
+    link: "/lesson-mobile",
   },
 ];
 

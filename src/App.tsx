@@ -14,6 +14,7 @@ import Contact from "@/pages/contact";
 import ListCourses from "./pages/list-courses";
 import LessonCapcut from "./layout/courses-premium/course-capcut/lesson-capcut";
 import LessonBds from "./layout/courses-premium/course-bds/lesson-bds";
+import LessonMobile from "./layout/courses-premium/course-mobile/lesson-mobile";
 import Login from "@/pages/login";
 import ManagePage from "@/admin/manage-page";
 import AccountManage from "@/admin/acount-manage";
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="/list-courses" element={<ListCourses />} />
           <Route path="/lesson-capcut" element={<LessonCapcut />} />
           <Route path="/lesson-bds" element={<LessonBds />} />
+          <Route path="/lesson-mobile" element={<LessonMobile />} />
         </Route>
 
         {/* Admin only */}

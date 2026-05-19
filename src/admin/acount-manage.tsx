@@ -8,6 +8,7 @@ import axios from "axios";
 const COURSES = [
   { id: "CAPCUT_AI", label: "Edit video CapCut nâng cao + AI" },
   { id: "BAT_DONG_SAN", label: "Edit video bất động sản" },
+  { id: "MOBILE", label: "Mobile" },
 ];
 
 interface User {
@@ -323,7 +324,6 @@ export default function AccountManagement() {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                 >
                   {showPassword ? (
-                    // Icon mắt gạch (ẩn)
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="w-5 h-5"
@@ -339,7 +339,6 @@ export default function AccountManagement() {
                       />
                     </svg>
                   ) : (
-                    // Icon mắt (hiện)
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="w-5 h-5"
