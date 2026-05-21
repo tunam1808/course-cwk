@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/default/header";
+import Footer from "@/default/footer";
 import Search from "@/layout/courses/search";
 import IntroduceDestop from "@/layout/home/introduce";
 import Source from "@/layout/home/source";
@@ -51,6 +52,7 @@ export default function Home() {
         <QR />
       </div>
       <Lucky />
+      <Footer />
     </div>
   );
 }
