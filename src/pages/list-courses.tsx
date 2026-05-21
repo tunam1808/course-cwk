@@ -1,4 +1,5 @@
 import Header from "@/default/header";
+import Footer from "@/default/footer";
 import Search from "@/layout/courses/search";
 import SelectCourses from "@/layout/courses/select-courses";
 
@@ -8,6 +9,7 @@ export default function ListCourses() {
       <Header />
       <Search />
       <SelectCourses />
+      <Footer />
     </div>
   );
 }

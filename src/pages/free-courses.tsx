@@ -1,4 +1,5 @@
 import Header from "@/default/header";
+import Footer from "@/default/footer";
 import Search from "@/layout/courses/search";
 import Lesson from "@/layout/courses/lessons";
 
@@ -8,6 +9,7 @@ export default function Home() {
       <Header />
       <Search />
       <Lesson />
+      <Footer />
     </div>
   );
 }

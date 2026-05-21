@@ -1,4 +1,5 @@
 import Header from "@/default/header";
+import Footer from "@/default/footer";
 import Search from "@/layout/courses/search";
 import SourceFree from "@/layout/vip-sources/source-vip";
 
@@ -8,6 +9,7 @@ export default function VipSources() {
       <Header />
       <Search />
       <SourceFree />
+      <Footer />
     </div>
   );
 }
