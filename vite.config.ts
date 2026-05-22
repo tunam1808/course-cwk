@@ -16,7 +16,7 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "logo.png", "images/**"],
+      includeAssets: ["favicon.ico", "logonguyen.png", "images/**"],
       manifest: {
         name: "Biên tập nghiệp dư",
         short_name: "CourseCWK",
@@ -47,6 +47,7 @@ export default defineConfig({
         ],
       },
       workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         runtimeCaching: [
           {
