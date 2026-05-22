@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import ScrollToTop from "@/components/scroll-to-top";
+import PWAInstallBanner from "@/components/PWAInstallBanner";
 import {
   PrivateRoute,
   AdminRoute,
@@ -28,6 +29,7 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
+      <PWAInstallBanner />
       <Routes>
         {/* Public — ai cũng vào được */}
         <Route path="/" element={<Home />} />
