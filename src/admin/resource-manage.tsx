@@ -20,6 +20,7 @@ import {
   FiList,
   FiLock,
   FiUnlock,
+  FiSliders, // ✅ Thêm mới cho LUT
 } from "react-icons/fi";
 import { resourceAdminApi } from "@/api/resource.api";
 import type {
@@ -55,6 +56,19 @@ function getFileColor(type: string) {
       icon: "text-emerald-400",
       border: "border-emerald-500/20",
     };
+  // ✅ Thêm mới
+  if (type === "IMAGE")
+    return {
+      bg: "bg-pink-500/15",
+      icon: "text-pink-400",
+      border: "border-pink-500/20",
+    };
+  if (type === "LUT")
+    return {
+      bg: "bg-orange-500/15",
+      icon: "text-orange-400",
+      border: "border-orange-500/20",
+    };
   return {
     bg: "bg-slate-500/15",
     icon: "text-slate-400",
@@ -75,6 +89,9 @@ function FileTypeIcon({
   if (type === "MP3") return <FiMusic className={`${cls} ${color.icon}`} />;
   if (type === "MP4") return <FiVideo className={`${cls} ${color.icon}`} />;
   if (type === "FONT") return <FiType className={`${cls} ${color.icon}`} />;
+  // ✅ Thêm mới
+  if (type === "IMAGE") return <FiImage className={`${cls} ${color.icon}`} />;
+  if (type === "LUT") return <FiSliders className={`${cls} ${color.icon}`} />;
   return <FiFile className={`${cls} ${color.icon}`} />;
 }
 
@@ -435,13 +452,11 @@ export default function ResourceManage() {
     loadCategories();
   };
 
-  // ✅ Fix Bug 1 — truyền object { name }
   const updateCategory = async (id: number, name: string) => {
     await resourceAdminApi.updateCategory(id, { name });
     loadCategories();
   };
 
-  // ✅ Fix Bug 2 — truyền object { isVip }
   const toggleCategoryAccess = async (cat: ResourceCategory) => {
     await resourceAdminApi.updateCategory(cat.id, { isVip: !cat.isVip });
     loadCategories();
@@ -843,11 +858,12 @@ export default function ResourceManage() {
             </div>
           </div>
 
+          {/* ✅ Thêm .gif .jpg .jpeg .png .cube vào accept */}
           <input
             ref={fileInputRef}
             type="file"
             multiple
-            accept="audio/*,video/*,.ttf,.otf,.woff,.woff2,.zip"
+            accept="audio/*,video/*,.ttf,.otf,.woff,.woff2,.zip,.gif,.jpg,.jpeg,.png,.cube"
             className="hidden"
             onChange={(e) => {
               if (e.target.files?.length) handleFilesSelected(e.target.files);

@@ -45,7 +45,7 @@ export interface ResourceFile {
   fileUrl: string;
   fileSize: number;
   mimeType: string;
-  fileType: "MP3" | "MP4" | "FONT" | "OTHER";
+  fileType: "MP3" | "MP4" | "FONT" | "IMAGE" | "LUT" | "OTHER";
   downloadCount: number;
   createdAt: string;
   updatedAt: string;

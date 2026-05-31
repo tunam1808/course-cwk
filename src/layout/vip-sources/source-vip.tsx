@@ -32,6 +32,16 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+// ✅ Helper lấy emoji theo fileType enum
+function getFileTypeEmoji(fileType: string): string {
+  if (fileType === "MP3") return "🎵";
+  if (fileType === "MP4") return "📹";
+  if (fileType === "FONT") return "🔤";
+  if (fileType === "IMAGE") return "🖼️";
+  if (fileType === "LUT") return "🎨";
+  return "📄";
+}
+
 function SkeletonCard() {
   return (
     <div
@@ -296,7 +306,6 @@ export default function OffersSection() {
   const [files, setFiles] = useState<ResourceFile[]>([]);
   const [filesLoading, setFilesLoading] = useState(false);
 
-  // ✅ Dùng publicApi.getAllCategories — trả về cả FREE lẫn VIP, không cần auth
   useEffect(() => {
     resourcePublicApi
       .getAllCategories()
@@ -325,10 +334,8 @@ export default function OffersSection() {
     fetchFiles();
   }, [selectedSubFolder]);
 
-  // ✅ VIP + chưa đăng nhập → redirect login
   const handleSelectCategory = (cat: ResourceCategory) => {
     if (cat.isVip && !isLoggedIn) {
-      console.log("Redirecting to login with from:", window.location.pathname);
       navigate("/login", { state: { from: window.location.pathname } });
       return;
     }
@@ -364,18 +371,9 @@ export default function OffersSection() {
     }
   };
 
-  const PREVIEWABLE = [
-    "MP3",
-    "MP4",
-    "JPG",
-    "JPEG",
-    "PNG",
-    "GIF",
-    "WEBP",
-    "SVG",
-  ];
+  // ✅ Fix: check đúng theo enum fileType thay vì string extension
   const canPreview = (file: ResourceFile) =>
-    PREVIEWABLE.includes((file.fileType ?? "").toUpperCase());
+    ["MP3", "MP4", "IMAGE"].includes(file.fileType);
 
   const handleBack = () => {
     if (selectedSubFolder) {
@@ -565,14 +563,9 @@ export default function OffersSection() {
                     }}
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {/* ✅ Dùng helper thay vì chain ternary dài */}
                       <span className="text-xl flex-shrink-0">
-                        {file.fileType === "MP3"
-                          ? "🎵"
-                          : file.fileType === "MP4"
-                            ? "📹"
-                            : file.fileType === "FONT"
-                              ? "🔤"
-                              : "📄"}
+                        {getFileTypeEmoji(file.fileType)}
                       </span>
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-white truncate">
@@ -584,6 +577,7 @@ export default function OffersSection() {
                       </div>
                     </div>
                     <div className="flex-shrink-0 flex items-center gap-2">
+                      {/* ✅ canPreview check đúng theo enum */}
                       {canPreview(file) && (
                         <button
                           onClick={() => window.open(file.fileUrl, "_blank")}
