@@ -99,6 +99,35 @@ export const resourcePublicApi = {
       { headers: authHeader() },
     );
   },
+
+  /** ✅ Stream ZIP toàn bộ file trong subfolder về client */
+  downloadZip: async (
+    subFolderId: number,
+    folderName: string,
+  ): Promise<void> => {
+    const token = getToken();
+    const res = await fetch(
+      `${BASE_URL}/resource-subfolders/${subFolderId}/download-zip`,
+      {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      },
+    );
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message ?? "Lỗi tải ZIP");
+    }
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${folderName}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
 };
 
 // ════════════════════════════════════════════════════════════════════

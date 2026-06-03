@@ -32,7 +32,6 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-// ✅ Helper lấy emoji theo fileType enum
 function getFileTypeEmoji(fileType: string): string {
   if (fileType === "MP3") return "🎵";
   if (fileType === "MP4") return "📹";
@@ -167,56 +166,13 @@ function SubFolderCard({
   onOpen: () => void;
 }) {
   const [dlState, setDlState] = useState<DownloadState>("idle");
-  const [progress, setProgress] = useState<{ done: number; total: number }>({
-    done: 0,
-    total: 0,
-  });
 
+  // ✅ Gọi API server zip — 1 request duy nhất, không tốn RAM trình duyệt
   const handleDownloadAll = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setDlState("loading");
-    setProgress({ done: 0, total: 0 });
     try {
-      const { items } = await resourcePublicApi.getFiles(sub.id);
-      if (items.length === 0) {
-        setDlState("done");
-        return;
-      }
-      setProgress({ done: 0, total: items.length });
-      const JSZip = (await import("jszip")).default;
-      const zip = new JSZip();
-      const getFileName = (file: ResourceFile, index: number): string => {
-        const urlExt = file.fileUrl
-          .split("?")[0]
-          .match(/\.([a-zA-Z0-9]+)$/)?.[1];
-        const nameHasExt = /\.[a-zA-Z0-9]{2,5}$/.test(file.name);
-        const baseName = file.name || `file_${index + 1}`;
-        return nameHasExt
-          ? baseName
-          : urlExt
-            ? `${baseName}.${urlExt.toLowerCase()}`
-            : baseName;
-      };
-      let done = 0;
-      await Promise.all(
-        items.map(async (file, index) => {
-          await resourcePublicApi.trackDownload(file.id);
-          const res = await fetch(file.fileUrl);
-          const blob = await res.blob();
-          zip.file(getFileName(file, index), blob);
-          done += 1;
-          setProgress({ done, total: items.length });
-        }),
-      );
-      const zipBlob = await zip.generateAsync({ type: "blob" });
-      const url = URL.createObjectURL(zipBlob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${sub.name}.zip`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      await resourcePublicApi.downloadZip(sub.id, sub.name);
       setDlState("done");
       setTimeout(() => setDlState("idle"), 3000);
     } catch {
@@ -226,12 +182,7 @@ function SubFolderCard({
   };
 
   const dlLabel = () => {
-    if (dlState === "loading") {
-      if (progress.total === 0) return "⏳ Đang chuẩn bị...";
-      if (progress.done < progress.total)
-        return `⏳ Đang tải ${progress.done}/${progress.total}...`;
-      return "📦 Đang nén ZIP...";
-    }
+    if (dlState === "loading") return "⏳ Đang chuẩn bị ZIP...";
     if (dlState === "done") return "✅ Đã tải xong!";
     if (dlState === "error") return "❌ Lỗi, thử lại";
     return "⬇ Tải cả folder (ZIP)";
@@ -371,7 +322,6 @@ export default function OffersSection() {
     }
   };
 
-  // ✅ Fix: check đúng theo enum fileType thay vì string extension
   const canPreview = (file: ResourceFile) =>
     ["MP3", "MP4", "IMAGE"].includes(file.fileType);
 
@@ -563,7 +513,6 @@ export default function OffersSection() {
                     }}
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      {/* ✅ Dùng helper thay vì chain ternary dài */}
                       <span className="text-xl flex-shrink-0">
                         {getFileTypeEmoji(file.fileType)}
                       </span>
@@ -577,7 +526,6 @@ export default function OffersSection() {
                       </div>
                     </div>
                     <div className="flex-shrink-0 flex items-center gap-2">
-                      {/* ✅ canPreview check đúng theo enum */}
                       {canPreview(file) && (
                         <button
                           onClick={() => window.open(file.fileUrl, "_blank")}
