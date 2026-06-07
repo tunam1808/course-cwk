@@ -47,7 +47,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         runtimeCaching: [
           {
@@ -57,6 +57,11 @@ export default defineConfig({
               cacheName: "images-cache",
               expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 30 },
             },
+          },
+          {
+            // Exclude download-zip khỏi cache
+            urlPattern: /^https:\/\/.*\/api\/.*\/download-zip/,
+            handler: "NetworkOnly",
           },
           {
             urlPattern: /^https:\/\/.*\/api\/.*/,
