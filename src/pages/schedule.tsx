@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -371,36 +371,45 @@ export default function MySchedule() {
           ) : (
             <>
               <div className="overflow-x-auto">
-                <div className="min-w-[1000px]">
-                  <div className="grid grid-cols-[100px_repeat(7,1fr)] border-b border-gray-700">
-                    <div className="p-4 flex items-center">
-                      <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Buổi
+                {/* Một grid DUY NHẤT bao trọn header + toàn bộ các dòng
+                    Sáng/Chiều/Tối — tránh dùng nhiều grid container riêng lẻ
+                    (mỗi cái tự làm tròn độ rộng cột "1fr" khác nhau), vốn là
+                    nguyên nhân khiến các cột bị lệch/xiên giữa các dòng. */}
+                <div className="min-w-[1000px] grid grid-cols-[100px_repeat(7,1fr)]">
+                  {/* Header */}
+                  <div className="p-4 flex items-center border-b border-gray-700">
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Buổi
+                    </span>
+                  </div>
+                  {WEEKDAY_LABELS.map((label, i) => (
+                    <div
+                      key={label}
+                      className="p-4 text-center border-l border-b border-gray-800"
+                    >
+                      <span className="text-sm font-semibold text-white block">
+                        {label}
+                      </span>
+                      <span className="text-[11px] text-gray-500">
+                        {formatShortDate(weekDates[i])}
                       </span>
                     </div>
-                    {WEEKDAY_LABELS.map((label, i) => (
-                      <div
-                        key={label}
-                        className="p-4 text-center border-l border-gray-800"
-                      >
-                        <span className="text-sm font-semibold text-white block">
-                          {label}
-                        </span>
-                        <span className="text-[11px] text-gray-500">
-                          {formatShortDate(weekDates[i])}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                  ))}
 
-                  {SESSIONS.map((session) => {
+                  {/* Các dòng Sáng / Chiều / Tối — cùng chung 1 grid với
+                      header ở trên, đảm bảo cột luôn thẳng hàng tuyệt đối. */}
+                  {SESSIONS.map((session, sIdx) => {
                     const Icon = session.icon;
+                    const isLastSession = sIdx === SESSIONS.length - 1;
+                    const borderCls = isLastSession
+                      ? ""
+                      : "border-b border-gray-800";
+
                     return (
-                      <div
-                        key={session.key}
-                        className="grid grid-cols-[100px_repeat(7,1fr)] border-b border-gray-800 last:border-b-0"
-                      >
-                        <div className="p-4 flex flex-col gap-1 justify-center bg-gray-900/60">
+                      <Fragment key={session.key}>
+                        <div
+                          className={`p-4 flex flex-col gap-1 justify-center bg-gray-900/60 ${borderCls}`}
+                        >
                           <div className="flex items-center gap-1.5 text-gray-200">
                             <Icon className="w-3.5 h-3.5 text-yellow-400" />
                             <span className="text-sm font-medium">
@@ -416,7 +425,7 @@ export default function MySchedule() {
                           return (
                             <div
                               key={key}
-                              className="p-2 border-l border-gray-800 min-h-[92px] flex flex-col gap-1.5"
+                              className={`p-2 border-l border-gray-800 min-h-[92px] flex flex-col gap-1.5 ${borderCls}`}
                             >
                               {cellItems.length === 0 ? (
                                 <div className="flex-1 flex items-center justify-center">
@@ -479,7 +488,7 @@ export default function MySchedule() {
                             </div>
                           );
                         })}
-                      </div>
+                      </Fragment>
                     );
                   })}
                 </div>
