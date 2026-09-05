@@ -15,6 +15,12 @@ export default defineConfig({
       hostname: "https://www.coursecwk.com",
     }),
     VitePWA({
+      // Chuyển sang injectManifest để có thể viết service worker tùy chỉnh
+      // (src/sw.ts) — cần thiết để xử lý sự kiện "push" và "notificationclick",
+      // điều mà chế độ generateSW mặc định không hỗ trợ.
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.ts",
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "logonguyen.png", "images/**"],
       manifest: {
@@ -46,35 +52,13 @@ export default defineConfig({
           },
         ],
       },
-      workbox: {
+      injectManifest: {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/.*\.(png|jpg|jpeg|svg|gif|webp)$/,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "images-cache",
-              expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 30 },
-            },
-          },
-          {
-            // Exclude download-zip khỏi cache
-            urlPattern: /^https:\/\/.*\/api\/.*\/download-zip/,
-            handler: "NetworkOnly",
-          },
-          {
-            urlPattern: /^https:\/\/.*\/api\/.*/,
-            handler: "NetworkFirst",
-            options: {
-              cacheName: "api-cache",
-              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 5 },
-            },
-          },
-        ],
       },
       devOptions: {
         enabled: true,
+        type: "module",
       },
     }),
   ],

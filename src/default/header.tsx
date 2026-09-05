@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/auth.context";
+import { scheduleApi } from "@/api/schedule.api";
 
 const navItems = [
   { label: "Trang chủ", href: "/" },
@@ -13,7 +14,33 @@ const navItems = [
 export default function Navbar() {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [fetchedAccess, setFetchedAccess] = useState(false);
   const location = useLocation();
+
+  // Admin luôn có quyền, chưa đăng nhập thì chắc chắn không
+  const hasScheduleAccess = !user
+    ? false
+    : user.role === "ADMIN"
+      ? true
+      : fetchedAccess;
+
+  useEffect(() => {
+    if (!user || user.role === "ADMIN") return;
+
+    let ignore = false;
+    scheduleApi
+      .checkMyAccess()
+      .then((res) => {
+        if (!ignore) setFetchedAccess(res.hasAccess);
+      })
+      .catch(() => {
+        if (!ignore) setFetchedAccess(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [user]);
 
   return (
     <nav className="bg-black text-white">
@@ -77,6 +104,14 @@ export default function Navbar() {
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-yellow-400 transition-colors"
                     >
                       🛠️ Trang quản lý
+                    </NavLink>
+                  )}
+                  {hasScheduleAccess && (
+                    <NavLink
+                      to="/schedule"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-yellow-400 transition-colors"
+                    >
+                      📅 Lịch của tôi
                     </NavLink>
                   )}
                   <NavLink
@@ -159,6 +194,15 @@ export default function Navbar() {
                   className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-yellow-400 rounded-md transition-colors"
                 >
                   🛠️ Trang quản lý
+                </NavLink>
+              )}
+              {hasScheduleAccess && (
+                <NavLink
+                  to="/schedule"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-yellow-400 rounded-md transition-colors"
+                >
+                  📅 Lịch của tôi
                 </NavLink>
               )}
               <NavLink

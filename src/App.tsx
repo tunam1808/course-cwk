@@ -23,7 +23,10 @@ import CoursesManage from "@/admin/courses-manage";
 import IntroManage from "@/admin/intro-manage";
 import CountdownManage from "@/admin/countdown-manage";
 import ResourceManage from "@/admin/resource-manage";
+import ScheduleManage from "@/admin/schedule-manage";
+import ListFeedback from "@/admin/schedule-list-feedback";
 import Profile from "@/pages/profile";
+import Schedule from "@/pages/schedule";
 
 export default function App() {
   return (
@@ -49,6 +52,7 @@ export default function App() {
           <Route path="/lesson-capcut" element={<LessonCapcut />} />
           <Route path="/lesson-bds" element={<LessonBds />} />
           <Route path="/lesson-mobile" element={<LessonMobile />} />
+          <Route path="/schedule" element={<Schedule />} />
         </Route>
 
         {/* Admin only */}
@@ -63,6 +67,8 @@ export default function App() {
             <Route path="intro-manage" element={<IntroManage />} />
             <Route path="countdown-manage" element={<CountdownManage />} />
             <Route path="resource-manage" element={<ResourceManage />} />
+            <Route path="schedule-manage" element={<ScheduleManage />} />
+            <Route path="schedule-list-feedback" element={<ListFeedback />} />
           </Route>
         </Route>
 
