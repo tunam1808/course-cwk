@@ -135,7 +135,7 @@ export default function OffersSection() {
     ? "Tất cả những thứ trên có giá:"
     : "Chào hè 2026 tất cả những thứ trên chỉ còn :";
 
-  const promoPrice = expired ? "1.399.000 VNĐ" : "888.000 VNĐ";
+  const promoPrice = expired ? "1.399.000 VNĐ" : "1.199.000 VNĐ";
 
   return (
     <>

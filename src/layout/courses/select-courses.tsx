@@ -14,15 +14,15 @@ const courses = [
     lessons: 40,
     link: "/lesson-capcut",
   },
-  {
-    id: "BAT_DONG_SAN",
-    title: "Thành thạo edit video bất động sản chuyên nghiệp",
-    description:
-      "Học kỹ thuật quay dựng video bất động sản đẳng cấp, tăng độ uy tín và thu hút khách hàng hiệu quả",
-    image: "/batdongsan.jpg",
-    lessons: 30,
-    link: "/lesson-bds",
-  },
+  // {
+  //   id: "BAT_DONG_SAN",
+  //   title: "Thành thạo edit video bất động sản chuyên nghiệp",
+  //   description:
+  //     "Học kỹ thuật quay dựng video bất động sản đẳng cấp, tăng độ uy tín và thu hút khách hàng hiệu quả",
+  //   image: "/batdongsan.jpg",
+  //   lessons: 30,
+  //   link: "/lesson-bds",
+  // },
   {
     id: "MOBILE",
     title: "Thành thạo edit video Capcut Mobile tất tần tật từ A-Z",
