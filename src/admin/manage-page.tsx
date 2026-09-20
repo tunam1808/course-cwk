@@ -8,6 +8,7 @@ import {
   FiClock,
   FiFolder,
   FiCalendar,
+  FiAward,
 } from "react-icons/fi";
 
 export default function AdminDashboard() {
@@ -136,6 +137,20 @@ export default function AdminDashboard() {
           >
             <FiCalendar className="w-6 h-6" />
             Thời khóa biểu
+          </NavLink>
+          <NavLink
+            to="/manage-page/score-manage"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-3 rounded-lg transition-all
+    ${
+      isActive
+        ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/40"
+        : "text-gray-300 hover:bg-gray-800 hover:text-yellow-400"
+    }`
+            }
+          >
+            <FiAward className="w-6 h-6" />
+            Đánh giá thành viên
           </NavLink>
         </aside>
 

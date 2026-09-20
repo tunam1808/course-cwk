@@ -25,6 +25,7 @@ import CountdownManage from "@/admin/countdown-manage";
 import ResourceManage from "@/admin/resource-manage";
 import ScheduleManage from "@/admin/schedule-manage";
 import ListFeedback from "@/admin/schedule-list-feedback";
+import ScoreManage from "@/admin/score-chart-manage";
 import Profile from "@/pages/profile";
 import Schedule from "@/pages/schedule";
 
@@ -69,6 +70,7 @@ export default function App() {
             <Route path="resource-manage" element={<ResourceManage />} />
             <Route path="schedule-manage" element={<ScheduleManage />} />
             <Route path="schedule-list-feedback" element={<ListFeedback />} />
+            <Route path="score-manage" element={<ScoreManage />} />
           </Route>
         </Route>
 
