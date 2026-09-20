@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Plus,
@@ -124,6 +124,7 @@ interface TypeConfig {
   bg: string;
   text: string;
   border: string;
+  accent: string; // viền trái đậm của thẻ
 }
 
 const WEEKDAY_LABELS = [
@@ -149,6 +150,7 @@ const TYPES: Record<TypeKey, TypeConfig> = {
     bg: "bg-yellow-400/10",
     text: "text-yellow-300",
     border: "border-yellow-400/30",
+    accent: "border-l-yellow-400",
   },
   choi: {
     label: "Buổi đi chơi",
@@ -156,6 +158,7 @@ const TYPES: Record<TypeKey, TypeConfig> = {
     bg: "bg-teal-400/10",
     text: "text-teal-300",
     border: "border-teal-400/30",
+    accent: "border-l-teal-400",
   },
 };
 
@@ -264,6 +267,166 @@ const makeEmptyForm = (defaultDate: string): LocalForm => ({
 });
 
 type Mode = "add" | "edit" | "delete" | null;
+
+// ─── Bảng thời khóa biểu ────────────────────────────────────────────────
+// Một lưới DUY NHẤT cho cả header lẫn 3 hàng Sáng/Chiều/Tối, nên mọi cột
+// luôn thẳng hàng. `minmax(160px, 1fr)` (thay cho `1fr` trơn = minmax(auto, 1fr))
+// khiến độ rộng cột không còn phụ thuộc nội dung thẻ bên trong.
+const GRID_COLS = "grid-cols-[88px_repeat(7,minmax(160px,1fr))]";
+
+function EventCard({
+  item,
+  isToday,
+  isPast,
+  onAttendance,
+}: {
+  item: LocalItem;
+  isToday: boolean;
+  isPast: boolean;
+  onAttendance: (item: LocalItem) => void;
+}) {
+  const t = TYPES[item.type];
+  const members = item.allTeam
+    ? "Cả team"
+    : item.members.map((m) => m.name).join(", ") || "Chưa có";
+
+  return (
+    <div
+      className={`rounded-lg border border-l-4 ${t.border} ${t.accent} ${t.bg} px-2.5 py-2`}
+    >
+      <div className="flex items-start justify-between gap-1.5">
+        <p
+          className={`text-xs font-semibold leading-snug break-words line-clamp-2 ${t.text}`}
+          title={item.title}
+        >
+          {item.title}
+        </p>
+        {/* Buổi đã qua: chỉ 1 icon ✓ nhỏ ở góc, thay cho dòng chữ lặp ở mọi thẻ */}
+        {isPast && (
+          <button
+            onClick={() => onAttendance(item)}
+            title="Điểm danh hoàn tất — bấm để xem"
+            aria-label="Xem điểm danh"
+            className="shrink-0 text-gray-500 hover:text-gray-200 transition-colors"
+          >
+            <CheckCircle2 className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      <p className="mt-1 flex items-center gap-1 text-[11px] text-gray-400 tabular-nums">
+        <Clock className="w-3 h-3 shrink-0" />
+        {item.start} – {item.end}
+      </p>
+
+      <p className="mt-0.5 flex items-start gap-1 text-[11px] text-gray-400 min-w-0">
+        <Users className="w-3 h-3 shrink-0 mt-0.5" />
+        <span className="line-clamp-2 break-words" title={members}>
+          {members}
+        </span>
+      </p>
+
+      {isToday && (
+        <button
+          onClick={() => onAttendance(item)}
+          className="mt-2 w-full inline-flex items-center justify-center gap-1 rounded-md bg-yellow-400/15 hover:bg-yellow-400/25 py-1 text-[11px] font-semibold text-yellow-300 transition-colors"
+        >
+          <UserCheck className="w-3 h-3" />
+          Điểm danh
+        </button>
+      )}
+    </div>
+  );
+}
+
+function ScheduleGrid({
+  weekDates,
+  grid,
+  todayStr,
+  onAttendance,
+}: {
+  weekDates: Date[];
+  grid: Record<string, LocalItem[]>;
+  todayStr: string;
+  onAttendance: (item: LocalItem) => void;
+}) {
+  return (
+    <div className="overflow-x-auto">
+      <div className={`grid ${GRID_COLS} min-w-[1210px]`}>
+        {/* ── Header ── */}
+        <div className="sticky left-0 z-10 bg-gray-900 flex items-center px-4 py-3 border-b border-gray-700">
+          <span className="text-xs font-medium text-gray-500">Buổi</span>
+        </div>
+        {WEEKDAY_LABELS.map((label, i) => {
+          const isCurrentDay = toDateInputValue(weekDates[i]) === todayStr;
+          return (
+            <div
+              key={label}
+              className="px-3 py-3 text-center border-l border-b border-l-gray-800 border-b-gray-700"
+            >
+              <span
+                className={`block text-sm font-semibold ${
+                  isCurrentDay ? "text-yellow-400" : "text-white"
+                }`}
+              >
+                {label}
+              </span>
+              <span
+                className={`text-[11px] ${
+                  isCurrentDay ? "text-yellow-400/70" : "text-gray-500"
+                }`}
+              >
+                {formatShortDate(weekDates[i])}
+              </span>
+            </div>
+          );
+        })}
+
+        {/* ── Body: mỗi buổi = 1 ô nhãn + 7 ô ngày, đều là con trực tiếp của lưới ── */}
+        {SESSIONS.map((session, si) => {
+          const Icon = session.icon;
+          const isLast = si === SESSIONS.length - 1;
+          const rowBorder = isLast ? "" : "border-b border-b-gray-800";
+          return (
+            <Fragment key={session.key}>
+              <div
+                className={`sticky left-0 z-10 bg-gray-900 flex items-center gap-1.5 px-4 py-3 text-gray-200 ${rowBorder}`}
+              >
+                <Icon className="w-3.5 h-3.5 text-yellow-400" />
+                <span className="text-sm font-medium">{session.label}</span>
+              </div>
+
+              {weekDates.map((date) => {
+                const dateStr = toDateInputValue(date);
+                const cellItems = grid[`${dateStr}-${session.key}`] ?? [];
+                const isCurrentDay = dateStr === todayStr;
+                return (
+                  <div
+                    key={dateStr}
+                    className={`min-w-0 min-h-[112px] p-2 flex flex-col gap-2 border-l border-l-gray-800 ${rowBorder} ${
+                      isCurrentDay ? "bg-yellow-400/[0.03]" : ""
+                    }`}
+                  >
+                    {/* Ô trống để trống hẳn — không cần dấu "—" */}
+                    {cellItems.map((item) => (
+                      <EventCard
+                        key={item.id}
+                        item={item}
+                        isToday={item.date === todayStr}
+                        isPast={item.date < todayStr}
+                        onAttendance={onAttendance}
+                      />
+                    ))}
+                  </div>
+                );
+              })}
+            </Fragment>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default function ScheduleManagement() {
   const navigate = useNavigate();
@@ -538,125 +701,12 @@ export default function ScheduleManagement() {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
-                <div className="min-w-[1000px]">
-                  <div className="grid grid-cols-[100px_repeat(7,1fr)] border-b border-gray-700">
-                    <div className="p-4 flex items-center">
-                      <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Buổi
-                      </span>
-                    </div>
-                    {WEEKDAY_LABELS.map((label, i) => (
-                      <div
-                        key={label}
-                        className="p-4 text-center border-l border-gray-800"
-                      >
-                        <span className="text-sm font-semibold text-white block">
-                          {label}
-                        </span>
-                        <span className="text-[11px] text-gray-500">
-                          {formatShortDate(weekDates[i])}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {SESSIONS.map((session) => {
-                    const Icon = session.icon;
-                    return (
-                      <div
-                        key={session.key}
-                        className="grid grid-cols-[100px_repeat(7,1fr)] border-b border-gray-800 last:border-b-0"
-                      >
-                        <div className="p-4 flex flex-col gap-1 justify-center bg-gray-900/60">
-                          <div className="flex items-center gap-1.5 text-gray-200">
-                            <Icon className="w-3.5 h-3.5 text-yellow-400" />
-                            <span className="text-sm font-medium">
-                              {session.label}
-                            </span>
-                          </div>
-                        </div>
-
-                        {weekDates.map((date) => {
-                          const dateStr = toDateInputValue(date);
-                          const key = `${dateStr}-${session.key}`;
-                          const cellItems = grid[key] ?? [];
-                          return (
-                            <div
-                              key={key}
-                              className="p-2 border-l border-gray-800 min-h-[92px] flex flex-col gap-1.5"
-                            >
-                              {cellItems.length === 0 ? (
-                                <div className="flex-1 flex items-center justify-center">
-                                  <span className="text-gray-700 text-xs">
-                                    —
-                                  </span>
-                                </div>
-                              ) : (
-                                cellItems.map((item) => {
-                                  const t = TYPES[item.type];
-                                  const isToday = item.date === todayStr;
-                                  const isPast = item.date < todayStr;
-                                  return (
-                                    <div
-                                      key={item.id}
-                                      className={`rounded-lg border ${t.border} ${t.bg} px-2.5 py-1.5`}
-                                    >
-                                      <p
-                                        className={`text-xs font-semibold ${t.text} leading-snug`}
-                                      >
-                                        {item.title}
-                                      </p>
-                                      <div className="flex items-center gap-1 mt-1 text-[10px] text-gray-400">
-                                        <Clock className="w-2.5 h-2.5" />
-                                        <span>
-                                          {item.start} – {item.end}
-                                        </span>
-                                      </div>
-                                      <div className="flex items-center gap-1 mt-0.5 text-[10px] text-gray-400">
-                                        <Users className="w-2.5 h-2.5" />
-                                        <span className="truncate">
-                                          {item.allTeam
-                                            ? "Cả team"
-                                            : item.members
-                                                .map((m) => m.name)
-                                                .join(", ") || "Chưa có"}
-                                        </span>
-                                      </div>
-                                      {isToday && (
-                                        <button
-                                          onClick={() =>
-                                            setAttendanceTarget(item)
-                                          }
-                                          className="flex items-center gap-1 mt-1.5 text-[10px] font-semibold text-yellow-400 hover:text-yellow-300 transition-colors"
-                                        >
-                                          <UserCheck className="w-3 h-3" />
-                                          Điểm danh
-                                        </button>
-                                      )}
-                                      {isPast && (
-                                        <button
-                                          onClick={() =>
-                                            setAttendanceTarget(item)
-                                          }
-                                          className="flex items-center gap-1 mt-1.5 text-[10px] font-medium text-gray-500 hover:text-gray-300 transition-colors"
-                                        >
-                                          <CheckCircle2 className="w-3 h-3" />
-                                          Điểm danh hoàn tất
-                                        </button>
-                                      )}
-                                    </div>
-                                  );
-                                })
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+              <ScheduleGrid
+                weekDates={weekDates}
+                grid={grid}
+                todayStr={todayStr}
+                onAttendance={setAttendanceTarget}
+              />
 
               {/* Chú thích loại buổi */}
               <div className="flex items-center gap-5 px-4 py-3 border-t border-gray-800">
