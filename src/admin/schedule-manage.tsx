@@ -56,7 +56,7 @@ function TimeSelect({
   const [hh, mm] = value.split(":");
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 min-w-0">
       <label className="block text-[11px] text-gray-500 mb-1">{label}</label>
       <div className="flex items-center gap-1.5 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 focus-within:border-yellow-400 transition-colors">
         <Clock className="w-3.5 h-3.5 text-gray-500 shrink-0" />
@@ -272,7 +272,9 @@ type Mode = "add" | "edit" | "delete" | null;
 // Một lưới DUY NHẤT cho cả header lẫn 3 hàng Sáng/Chiều/Tối, nên mọi cột
 // luôn thẳng hàng. `minmax(160px, 1fr)` (thay cho `1fr` trơn = minmax(auto, 1fr))
 // khiến độ rộng cột không còn phụ thuộc nội dung thẻ bên trong.
-const GRID_COLS = "grid-cols-[88px_repeat(7,minmax(160px,1fr))]";
+// Trên mobile, lịch tuần vẫn cuộn ngang (min-w cố định) vì đây là cách
+// hiển thị hợp lý nhất cho dạng lưới 7 cột — không nhồi ép co lại.
+const GRID_COLS = "grid-cols-[72px_repeat(7,minmax(140px,1fr))]";
 
 function EventCard({
   item,
@@ -352,9 +354,9 @@ function ScheduleGrid({
 }) {
   return (
     <div className="overflow-x-auto">
-      <div className={`grid ${GRID_COLS} min-w-[1210px]`}>
+      <div className={`grid ${GRID_COLS} min-w-[1090px]`}>
         {/* ── Header ── */}
-        <div className="sticky left-0 z-10 bg-gray-900 flex items-center px-4 py-3 border-b border-gray-700">
+        <div className="sticky left-0 z-10 bg-gray-900 flex items-center px-3 sm:px-4 py-3 border-b border-gray-700">
           <span className="text-xs font-medium text-gray-500">Buổi</span>
         </div>
         {WEEKDAY_LABELS.map((label, i) => {
@@ -390,9 +392,9 @@ function ScheduleGrid({
           return (
             <Fragment key={session.key}>
               <div
-                className={`sticky left-0 z-10 bg-gray-900 flex items-center gap-1.5 px-4 py-3 text-gray-200 ${rowBorder}`}
+                className={`sticky left-0 z-10 bg-gray-900 flex items-center gap-1.5 px-3 sm:px-4 py-3 text-gray-200 ${rowBorder}`}
               >
-                <Icon className="w-3.5 h-3.5 text-yellow-400" />
+                <Icon className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
                 <span className="text-sm font-medium">{session.label}</span>
               </div>
 
@@ -624,15 +626,15 @@ export default function ScheduleManagement() {
   const selectedItem = items.find((i) => String(i.id) === String(selectedId));
 
   return (
-    <div className="min-h-screen bg-black p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-black p-3 sm:p-6">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {/* ====== HEADER ====== */}
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-2xl font-bold text-yellow-400">
+            <h2 className="text-xl sm:text-2xl font-bold text-yellow-400">
               Thời khóa biểu
             </h2>
-            <p className="text-gray-400 text-sm mt-1">
+            <p className="text-gray-400 text-xs sm:text-sm mt-1">
               {loading
                 ? "Đang tải..."
                 : `${items.length} buổi trong tuần ${formatShortDate(weekStart)} – ${formatShortDate(weekEnd)}`}
@@ -640,7 +642,7 @@ export default function ScheduleManagement() {
           </div>
           <button
             onClick={() => navigate("/manage-page/schedule-list-feedback")}
-            className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 hover:text-yellow-400 transition-all"
+            className="shrink-0 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 hover:text-yellow-400 transition-all w-full sm:w-auto"
           >
             <ClipboardList className="w-4 h-4" />
             Xem đánh giá
@@ -648,47 +650,47 @@ export default function ScheduleManagement() {
         </div>
 
         {/* ====== THANH CHỌN TUẦN ====== */}
-        <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 flex flex-wrap items-center gap-3">
-          <button
-            onClick={goPrevWeek}
-            disabled={!canGoPrevWeek}
-            className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed text-gray-300 transition-all"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
+        <div className="bg-gray-900 border border-gray-700 rounded-xl p-3 sm:p-4 flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 order-1">
+            <button
+              onClick={goPrevWeek}
+              disabled={!canGoPrevWeek}
+              className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed text-gray-300 transition-all"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={goNextWeek}
+              disabled={!canGoNextWeek}
+              className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed text-gray-300 transition-all"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={goThisWeek}
+              className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-800 hover:bg-gray-700 text-gray-300 transition-all"
+            >
+              Tuần này
+            </button>
+          </div>
 
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-gray-400">Từ ngày</span>
+          <div className="flex flex-wrap items-center gap-2 text-sm order-2 w-full sm:w-auto sm:ml-auto">
+            <span className="text-gray-400">Từ</span>
             <input
               type="date"
               value={toDateInputValue(weekStart)}
               min={toDateInputValue(MIN_WEEK_START)}
               max={toDateInputValue(MAX_WEEK_START)}
               onChange={(e) => handlePickFromDate(e.target.value)}
-              className="bg-gray-800 border border-gray-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-yellow-400 transition-colors"
+              className="bg-gray-800 border border-gray-700 rounded-lg px-2.5 py-1.5 text-white text-sm focus:outline-none focus:border-yellow-400 transition-colors min-w-0"
             />
-            <span className="text-gray-400">đến ngày</span>
-            <span className="text-white font-medium px-2.5 py-1.5 bg-gray-800/60 rounded-lg border border-gray-800">
+            <span className="text-gray-400">đến</span>
+            <span className="text-white font-medium px-2.5 py-1.5 bg-gray-800/60 rounded-lg border border-gray-800 text-sm">
               {formatShortDate(weekEnd)}
             </span>
           </div>
 
-          <button
-            onClick={goNextWeek}
-            disabled={!canGoNextWeek}
-            className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed text-gray-300 transition-all"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-
-          <button
-            onClick={goThisWeek}
-            className="ml-auto px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-800 hover:bg-gray-700 text-gray-300 transition-all"
-          >
-            Tuần này
-          </button>
-
-          <span className="w-full text-[11px] text-gray-500">
+          <span className="w-full order-3 text-[11px] text-gray-500">
             Chỉ tra cứu được trong khoảng ±1 tháng kể từ hôm nay
           </span>
         </div>
@@ -701,6 +703,9 @@ export default function ScheduleManagement() {
             </div>
           ) : (
             <>
+              <p className="sm:hidden text-[11px] text-gray-500 px-3 pt-3">
+                Vuốt ngang để xem cả tuần →
+              </p>
               <ScheduleGrid
                 weekDates={weekDates}
                 grid={grid}
@@ -709,7 +714,7 @@ export default function ScheduleManagement() {
               />
 
               {/* Chú thích loại buổi */}
-              <div className="flex items-center gap-5 px-4 py-3 border-t border-gray-800">
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3 border-t border-gray-800">
                 {(Object.entries(TYPES) as [TypeKey, TypeConfig][]).map(
                   ([key, t]) => (
                     <div key={key} className="flex items-center gap-1.5">
@@ -724,45 +729,45 @@ export default function ScheduleManagement() {
         </div>
 
         {/* ====== PHẦN 2: THÊM / SỬA / XÓA ====== */}
-        <div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 sm:p-6">
           <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">
             Quản lý buổi học / buổi đi chơi
           </h3>
 
           {/* Tab chọn thao tác */}
-          <div className="flex gap-3 mb-5">
+          <div className="grid grid-cols-3 gap-2 sm:flex sm:gap-3 mb-5">
             <button
               onClick={() => openMode("add")}
               disabled={loading}
-              className={`flex-1 py-3 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+              className={`py-3 rounded-lg font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed sm:flex-1 ${
                 mode === "add"
                   ? "bg-yellow-500 text-black"
                   : "bg-gray-800 text-gray-300 hover:bg-gray-700"
               }`}
             >
-              <Plus className="w-4 h-4" /> Thêm
+              <Plus className="w-4 h-4 shrink-0" /> Thêm
             </button>
             <button
               onClick={() => openMode("edit")}
               disabled={loading}
-              className={`flex-1 py-3 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+              className={`py-3 rounded-lg font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed sm:flex-1 ${
                 mode === "edit"
                   ? "bg-yellow-500 text-black"
                   : "bg-gray-800 text-gray-300 hover:bg-gray-700"
               }`}
             >
-              <Pencil className="w-4 h-4" /> Sửa
+              <Pencil className="w-4 h-4 shrink-0" /> Sửa
             </button>
             <button
               onClick={() => openMode("delete")}
               disabled={loading}
-              className={`flex-1 py-3 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+              className={`py-3 rounded-lg font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed sm:flex-1 ${
                 mode === "delete"
                   ? "bg-red-500 text-white"
                   : "bg-gray-800 text-gray-300 hover:bg-gray-700"
               }`}
             >
-              <Trash2 className="w-4 h-4" /> Xóa
+              <Trash2 className="w-4 h-4 shrink-0" /> Xóa
             </button>
           </div>
 
@@ -811,7 +816,7 @@ export default function ScheduleManagement() {
           {(mode === "add" || (mode === "edit" && selectedId)) && (
             <div className="space-y-4">
               {/* Ngày + Loại buổi */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-gray-400 mb-1.5">
                     Ngày
@@ -870,13 +875,15 @@ export default function ScheduleManagement() {
                 <label className="block text-xs font-medium text-gray-400 mb-1.5">
                   Thời gian
                 </label>
-                <div className="flex items-end gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-end gap-2">
                   <TimeSelect
                     label="Giờ bắt đầu"
                     value={form.start}
                     onChange={(v) => setForm({ ...form, start: v })}
                   />
-                  <span className="text-gray-500 text-sm pb-3">đến</span>
+                  <span className="hidden sm:block text-gray-500 text-sm pb-3">
+                    đến
+                  </span>
                   <TimeSelect
                     label="Giờ kết thúc"
                     value={form.end}

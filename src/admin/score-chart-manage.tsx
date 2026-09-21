@@ -99,50 +99,54 @@ function ReasonRow({
 
   if (editing) {
     return (
-      <div className="flex items-center gap-2 bg-gray-800 border border-yellow-400/40 rounded-lg px-3 py-2">
+      <div className="flex flex-wrap items-center gap-2 bg-gray-800 border border-yellow-400/40 rounded-lg px-3 py-2">
         <input
           type="text"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
-          className="flex-1 bg-gray-900 border border-gray-700 rounded-md px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-yellow-400 min-w-0"
+          className="flex-1 min-w-[140px] bg-gray-900 border border-gray-700 rounded-md px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-yellow-400"
         />
         <input
           type="number"
           value={defaultPoints}
           onChange={(e) => setDefaultPoints(e.target.value)}
           placeholder="Điểm mặc định"
-          className="w-28 bg-gray-900 border border-gray-700 rounded-md px-2.5 py-1.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400"
+          className="w-full sm:w-28 bg-gray-900 border border-gray-700 rounded-md px-2.5 py-1.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400"
         />
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="p-1.5 text-green-400 hover:bg-green-500/10 rounded-md transition-colors disabled:opacity-40"
-        >
-          <Check className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => {
-            setEditing(false);
-            setLabel(reason.label);
-            setDefaultPoints(
-              reason.defaultPoints !== null ? String(reason.defaultPoints) : "",
-            );
-          }}
-          disabled={saving}
-          className="p-1.5 text-gray-500 hover:bg-gray-700 rounded-md transition-colors"
-        >
-          <X className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-1 ml-auto sm:ml-0">
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="p-1.5 text-green-400 hover:bg-green-500/10 rounded-md transition-colors disabled:opacity-40"
+          >
+            <Check className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => {
+              setEditing(false);
+              setLabel(reason.label);
+              setDefaultPoints(
+                reason.defaultPoints !== null
+                  ? String(reason.defaultPoints)
+                  : "",
+              );
+            }}
+            disabled={saving}
+            className="p-1.5 text-gray-500 hover:bg-gray-700 rounded-md transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex items-center gap-2 bg-gray-800 border border-gray-700 text-gray-200 text-sm pl-3 pr-1.5 py-1.5 rounded-lg">
-      <span className="flex-1">{reason.label}</span>
+      <span className="flex-1 min-w-0 break-words">{reason.label}</span>
       {reason.defaultPoints !== null && (
         <span
-          className={`text-xs font-bold px-1.5 py-0.5 rounded ${
+          className={`shrink-0 text-xs font-bold px-1.5 py-0.5 rounded ${
             reason.defaultPoints > 0
               ? "bg-green-500/15 text-green-400"
               : "bg-red-500/15 text-red-400"
@@ -154,13 +158,13 @@ function ReasonRow({
       )}
       <button
         onClick={() => setEditing(true)}
-        className="text-gray-500 hover:text-yellow-400 transition-colors p-1"
+        className="shrink-0 text-gray-500 hover:text-yellow-400 transition-colors p-1"
       >
         <Pencil className="w-3.5 h-3.5" />
       </button>
       <button
         onClick={handleDelete}
-        className="text-gray-500 hover:text-red-400 transition-colors p-1"
+        className="shrink-0 text-gray-500 hover:text-red-400 transition-colors p-1"
       >
         <X className="w-4 h-4" />
       </button>
@@ -222,14 +226,14 @@ function ApplyScoreModal({
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4">
-      <div className="bg-gray-900 border border-gray-700 rounded-xl w-full max-w-md p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-yellow-400">
+      <div className="bg-gray-900 border border-gray-700 rounded-xl w-full max-w-md p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <h3 className="text-lg font-bold text-yellow-400 break-words min-w-0">
             Chấm điểm: {displayName(student)}
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-white transition-colors"
+            className="shrink-0 text-gray-500 hover:text-white transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -357,14 +361,14 @@ function StudentDetailModal({
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4">
-      <div className="bg-gray-900 border border-gray-700 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-yellow-400">
+      <div className="bg-gray-900 border border-gray-700 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <h3 className="text-lg font-bold text-yellow-400 break-words min-w-0">
             {detail ? displayName(detail) : "Đang tải..."}
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-white transition-colors"
+            className="shrink-0 text-gray-500 hover:text-white transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -420,8 +424,8 @@ function StudentDetailModal({
                         : "bg-red-500/5 border-red-500/20"
                     }`}
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm text-white font-medium">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="flex-1 min-w-0 break-words text-sm text-white font-medium">
                         {log.reasonLabel}
                       </p>
                       <div className="flex items-center gap-2 shrink-0">
@@ -443,7 +447,9 @@ function StudentDetailModal({
                       </div>
                     </div>
                     {log.note && (
-                      <p className="text-xs text-gray-500 mt-1">{log.note}</p>
+                      <p className="text-xs text-gray-500 mt-1 break-words">
+                        {log.note}
+                      </p>
                     )}
                     <div className="flex items-center gap-1 mt-1.5 text-[11px] text-gray-600">
                       <Clock className="w-3 h-3" />
@@ -572,6 +578,8 @@ function PeriodChart({
 // làm html2canvas mất tham chiếu tới đúng node giữa lúc đang xử lý bất đồng
 // bộ, gây lỗi "Unable to find element in cloned iframe". Dùng textContent
 // (không phải innerHTML) để an toàn với dữ liệu người dùng nhập (ghi chú...).
+// Khối này chỉ được render ẩn ngoài màn hình để chụp ảnh ở kích thước cố
+// định 800px (chuẩn cho ảnh/PDF xuất ra) nên KHÔNG cần responsive.
 function buildScoreReportElement(
   studentName: string,
   studentEmail: string,
@@ -940,41 +948,42 @@ function PeriodChartModal({
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4">
-      <div className="bg-gray-900 border border-gray-700 rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-yellow-400 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5" />
-            Biểu đồ theo tuần / tháng
+      <div className="bg-gray-900 border border-gray-700 rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+        {/* Tiêu đề + nút đóng luôn ở một hàng riêng, không chen với các nút
+            xuất báo cáo — tránh vỡ layout khi màn hình hẹp. */}
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <h3 className="text-lg font-bold text-yellow-400 flex items-center gap-2 min-w-0">
+            <BarChart3 className="w-5 h-5 shrink-0" />
+            <span className="break-words">Biểu đồ theo tuần / tháng</span>
           </h3>
-          <div className="flex items-center gap-2">
-            {selectedStudent && (
-              <>
-                <button
-                  onClick={() => handleExport("png")}
-                  disabled={exporting !== null}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 transition-all disabled:opacity-40"
-                >
-                  <ImageIcon className="w-3.5 h-3.5" />
-                  {exporting === "png" ? "Đang xuất..." : "Xuất ảnh"}
-                </button>
-                <button
-                  onClick={() => handleExport("pdf")}
-                  disabled={exporting !== null}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 transition-all disabled:opacity-40"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  {exporting === "pdf" ? "Đang xuất..." : "Xuất PDF"}
-                </button>
-              </>
-            )}
+          <button
+            onClick={onClose}
+            className="shrink-0 text-gray-500 hover:text-white transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {selectedStudent && (
+          <div className="flex flex-wrap gap-2 mb-4">
             <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-white transition-colors"
+              onClick={() => handleExport("png")}
+              disabled={exporting !== null}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 transition-all disabled:opacity-40"
             >
-              <X className="w-5 h-5" />
+              <ImageIcon className="w-3.5 h-3.5" />
+              {exporting === "png" ? "Đang xuất..." : "Xuất ảnh"}
+            </button>
+            <button
+              onClick={() => handleExport("pdf")}
+              disabled={exporting !== null}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 transition-all disabled:opacity-40"
+            >
+              <Download className="w-3.5 h-3.5" />
+              {exporting === "pdf" ? "Đang xuất..." : "Xuất PDF"}
             </button>
           </div>
-        </div>
+        )}
 
         {/* Chọn học viên + chế độ */}
         <div className="flex flex-wrap gap-3 mb-5">
@@ -1020,14 +1029,14 @@ function PeriodChartModal({
           </p>
         ) : mode === "week" ? (
           <div>
-            <div className="flex items-center justify-center gap-3 mb-5">
+            <div className="flex flex-wrap items-center justify-center gap-3 mb-5">
               <button
                 onClick={goPrevWeek}
                 className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 transition-all"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="text-sm text-white font-medium px-3 py-2 bg-gray-800/60 rounded-lg border border-gray-800">
+              <span className="text-sm text-white font-medium px-3 py-2 bg-gray-800/60 rounded-lg border border-gray-800 text-center">
                 Tuần {formatShortDate(weekAnchor)} - {formatShortDate(weekEnd)}
               </span>
               <button
@@ -1048,14 +1057,14 @@ function PeriodChartModal({
           </div>
         ) : (
           <div>
-            <div className="flex items-center justify-center gap-3 mb-5">
+            <div className="flex flex-wrap items-center justify-center gap-3 mb-5">
               <button
                 onClick={goPrevMonth}
                 className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 transition-all"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="text-sm text-white font-medium px-3 py-2 bg-gray-800/60 rounded-lg border border-gray-800">
+              <span className="text-sm text-white font-medium px-3 py-2 bg-gray-800/60 rounded-lg border border-gray-800 text-center">
                 Tháng {monthNum}/{monthYear}
               </span>
               <button
@@ -1164,9 +1173,9 @@ export default function StudentScoreManagement() {
   );
 
   return (
-    <div className="min-h-screen bg-black p-6">
+    <div className="min-h-screen bg-black p-4 sm:p-6">
       <div className="max-w-5xl mx-auto space-y-6">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h2 className="text-2xl font-bold text-yellow-400">
               Đánh giá điểm học viên
@@ -1178,7 +1187,7 @@ export default function StudentScoreManagement() {
           <button
             onClick={() => setShowPeriodModal(true)}
             disabled={students.length === 0}
-            className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-gray-800 hover:bg-gray-700 border border-gray-700 text-yellow-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            className="self-start sm:self-auto shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-gray-800 hover:bg-gray-700 border border-gray-700 text-yellow-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <BarChart3 className="w-4 h-4" />
             Biểu đồ theo tuần/tháng
@@ -1186,16 +1195,16 @@ export default function StudentScoreManagement() {
         </div>
 
         {/* ====== DANH SÁCH LÝ DO ====== */}
-        <div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 sm:p-6">
           <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">
             Danh sách lý do
           </h3>
-          <div className="flex gap-2 mb-4">
+          <div className="flex flex-col sm:flex-row gap-2 mb-4">
             <input
               type="text"
               value={newReasonLabel}
               onChange={(e) => setNewReasonLabel(e.target.value)}
-              placeholder="VD: Đi trễ, Giúp đỡ bạn học..."
+              placeholder="VD: Khen anh Nam đẹp trai hơn Phương..."
               className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition-colors"
             />
             <input
@@ -1206,14 +1215,15 @@ export default function StudentScoreManagement() {
                 if (e.key === "Enter") handleAddReason();
               }}
               placeholder="Điểm mặc định (tuỳ chọn)"
-              className="w-48 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition-colors"
+              className="w-full sm:w-48 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition-colors"
             />
             <button
               onClick={handleAddReason}
               disabled={addingReason || !newReasonLabel.trim()}
-              className="px-4 py-2.5 bg-yellow-500 hover:bg-yellow-400 disabled:opacity-40 text-black font-bold rounded-lg transition-all shrink-0"
+              className="px-4 py-2.5 bg-yellow-500 hover:bg-yellow-400 disabled:opacity-40 text-black font-bold rounded-lg transition-all shrink-0 flex items-center justify-center gap-2"
             >
               <Plus className="w-4 h-4" />
+              <span className="sm:hidden">Thêm lý do</span>
             </button>
           </div>
           <p className="text-[11px] text-gray-500 -mt-2 mb-4">
@@ -1240,19 +1250,19 @@ export default function StudentScoreManagement() {
         </div>
 
         {/* ====== DANH SÁCH HỌC VIÊN ====== */}
-        <div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider">
               Học viên ({students.length})
             </h3>
-            <div className="flex items-center gap-2 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 w-64">
+            <div className="flex items-center gap-2 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 w-full sm:w-64">
               <Search className="w-3.5 h-3.5 text-gray-500 shrink-0" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Tìm học viên..."
-                className="bg-transparent text-sm text-white placeholder-gray-600 focus:outline-none w-full"
+                className="bg-transparent text-sm text-white placeholder-gray-600 focus:outline-none w-full min-w-0"
               />
             </div>
           </div>
@@ -1270,13 +1280,13 @@ export default function StudentScoreManagement() {
               {filteredStudents.map((s) => (
                 <div
                   key={s.userId}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-gray-800 bg-gray-900 hover:bg-gray-800/50 px-4 py-3 transition-all"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border border-gray-800 bg-gray-900 hover:bg-gray-800/50 px-4 py-3 transition-all"
                 >
                   <button
                     onClick={() => setDetailUserId(s.userId)}
-                    className="flex items-center gap-3 min-w-0 flex-1 text-left"
+                    className="flex items-center gap-3 min-w-0 sm:flex-1 text-left"
                   >
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="text-sm text-white truncate flex items-center gap-1.5">
                         {displayName(s)}
                         {s.warningLevel === "SEVERE" && (
@@ -1290,10 +1300,10 @@ export default function StudentScoreManagement() {
                         {s.email}
                       </p>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-gray-600 shrink-0 ml-auto" />
+                    <ChevronRight className="w-4 h-4 text-gray-600 shrink-0 sm:hidden" />
                   </button>
 
-                  <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
                     <div className="text-right">
                       <p className="text-sm font-bold text-white">
                         {s.netScore}
@@ -1304,7 +1314,7 @@ export default function StudentScoreManagement() {
                     </div>
                     <button
                       onClick={() => setApplyTarget(s)}
-                      className="px-3 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-yellow-400 text-xs font-semibold rounded-lg transition-all"
+                      className="px-3 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-yellow-400 text-xs font-semibold rounded-lg transition-all shrink-0"
                     >
                       Chấm điểm
                     </button>

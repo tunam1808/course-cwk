@@ -249,10 +249,10 @@ export default function ManageIntro() {
 
   // ─── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="border-b border-gray-800 pb-5">
-        <h2 className="text-2xl font-bold text-yellow-400 tracking-tight">
+      <div className="border-b border-gray-800 pb-4 sm:pb-5">
+        <h2 className="text-xl sm:text-2xl font-bold text-yellow-400 tracking-tight">
           Quản lý Video Intro (9:16)
         </h2>
         <p className="mt-1 text-sm text-gray-400">
@@ -268,7 +268,7 @@ export default function ManageIntro() {
           <span>Không thể tải danh sách video intro.</span>
           <button
             onClick={fetchIntros}
-            className="ml-auto text-xs underline underline-offset-2 hover:text-red-300 transition-colors"
+            className="ml-auto shrink-0 text-xs underline underline-offset-2 hover:text-red-300 transition-colors"
           >
             Thử lại
           </button>
@@ -282,7 +282,9 @@ export default function ManageIntro() {
           Đang tải dữ liệu...
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+        // auto-fill: tự chia 1 / 2 / 3 cột tùy bề rộng thực tế của vùng nội
+        // dung (đã trừ sidebar), không phụ thuộc breakpoint của màn hình.
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,220px),1fr))] gap-4 sm:gap-6">
           {([1, 2, 3, 4, 5, 6] as const).map((slotNumber) => {
             const index = slotNumber - 1;
             const slotState = slots[index];
@@ -292,7 +294,9 @@ export default function ManageIntro() {
             return (
               <div
                 key={slotNumber}
-                className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4"
+                // max-w: khi chỉ có 1 cột (mobile) thì thẻ không giãn hết
+                // màn hình, tránh khung 9:16 cao quá cả màn hình điện thoại.
+                className="w-full max-w-[300px] mx-auto bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-5 space-y-4"
               >
                 {/* Header */}
                 <div className="flex items-center justify-between">
@@ -326,14 +330,14 @@ export default function ManageIntro() {
                                 0,
                               );
                             }}
-                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 text-xs font-medium transition-colors border border-yellow-500/30"
+                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 text-xs font-medium transition-colors border border-yellow-500/30"
                           >
                             <FiRefreshCw className="w-3.5 h-3.5" />
                             Thay đổi video
                           </button>
                           <button
                             onClick={() => handleDelete(slotNumber)}
-                            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium transition-colors border border-red-500/30"
+                            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium transition-colors border border-red-500/30"
                           >
                             <FiTrash2 className="w-3.5 h-3.5" />
                             Xóa
@@ -380,7 +384,7 @@ export default function ManageIntro() {
                         }
                         className={`
                         relative aspect-[9/16] border-2 border-dashed rounded-2xl
-                        flex flex-col items-center justify-center gap-2 transition-all duration-300
+                        flex flex-col items-center justify-center gap-2 px-3 text-center transition-all duration-300
                         ${
                           isRunning
                             ? "border-gray-800 opacity-40 cursor-not-allowed"
@@ -403,9 +407,19 @@ export default function ManageIntro() {
                         <p className="text-gray-400 text-sm">Chưa có video</p>
                         {!isRunning && (
                           <p className="text-yellow-400 text-xs">
-                            {slotState.isDragging
-                              ? "Thả file vào đây"
-                              : "Kéo thả hoặc click để chọn"}
+                            {slotState.isDragging ? (
+                              "Thả file vào đây"
+                            ) : (
+                              <>
+                                {/* Điện thoại không kéo thả được nên đổi câu chữ */}
+                                <span className="hidden sm:inline">
+                                  Kéo thả hoặc click để chọn
+                                </span>
+                                <span className="sm:hidden">
+                                  Chạm để chọn video
+                                </span>
+                              </>
+                            )}
                           </p>
                         )}
                       </div>
@@ -432,6 +446,7 @@ export default function ManageIntro() {
                       <video
                         src={slotState.preview ?? ""}
                         controls
+                        playsInline
                         className="w-full max-h-52 object-contain"
                       />
                     </div>
@@ -451,8 +466,9 @@ export default function ManageIntro() {
                       {!isRunning && slotState.status !== "done" && (
                         <button
                           onClick={() => handleRemoveFile(index)}
-                          className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                          className="shrink-0 p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                           title="Hủy chọn file"
+                          aria-label="Hủy chọn file"
                         >
                           <FiTrash2 className="w-4 h-4" />
                         </button>
@@ -508,12 +524,12 @@ export default function ManageIntro() {
 
       {/* Nút Upload tất cả */}
       {hasAnyReady && !allDone && (
-        <div className="flex items-center gap-4 pt-2">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2">
           <button
             onClick={handleUploadAll}
             disabled={isRunning}
             className={`
-              flex items-center gap-2 px-7 py-3 rounded-xl font-semibold text-sm transition-all
+              w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3 rounded-xl font-semibold text-sm transition-all
               ${
                 isRunning
                   ? "bg-yellow-500/40 text-yellow-200 cursor-not-allowed"
@@ -535,7 +551,7 @@ export default function ManageIntro() {
           </button>
 
           {!isRunning && (
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 text-center sm:text-left">
               Upload tuần tự: Video 1 → Video 2 → Video 3 → Video 4 → Video 5 →
               Video 6
             </p>

@@ -9,6 +9,7 @@ import {
   FiCheck,
   FiX,
   FiChevronRight,
+  FiChevronLeft,
   FiImage,
   FiMusic,
   FiVideo,
@@ -30,6 +31,22 @@ import type {
 } from "@/api/resource.api";
 
 // ── Helpers ────────────────────────────────────────────────────────────
+
+// Nút chỉ hiện khi rê chuột — nhưng CHỈ trên thiết bị thật sự có hover.
+// Trên điện thoại/tablet cảm ứng (không có hover) các nút này luôn hiển thị,
+// nếu không sẽ không thể đổi tên / xóa / tải xuống được.
+const REVEAL_ON_HOVER =
+  "[@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100";
+const REVEAL_ON_EDIT_HOVER =
+  "[@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/edit:opacity-100";
+
+// Lưới file: tự chia số cột theo bề rộng thực tế của khung file
+// (không phụ thuộc breakpoint vì còn bị sidebar chiếm chỗ).
+const FILE_GRID = "grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-3";
+
+// Danh sách file: nhỏ gọn (icon | tên + thông tin | nút) và chỉ hiện đủ 6 cột ở xl.
+const LIST_COLS =
+  "grid-cols-[2rem_minmax(0,1fr)_auto] xl:grid-cols-[2rem_minmax(0,1fr)_9rem_7rem_5rem_5rem]";
 
 function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -156,18 +173,22 @@ function InlineEdit({
             if (e.key === "Enter") save();
             if (e.key === "Escape") setEditing(false);
           }}
-          className="bg-[#2d2e30] border border-[#5f6368] rounded px-2 py-0.5 text-[#e8eaed] text-sm w-36 outline-none focus:border-[#8ab4f8]"
+          // min-w-0 + flex-1: co giãn theo hàng thay vì cố định w-36 (tràn trên mobile).
+          // text-base trên mobile để iOS không tự phóng to trang khi focus.
+          className="min-w-0 w-36 max-w-full flex-1 bg-[#2d2e30] border border-[#5f6368] rounded px-2 py-0.5 text-[#e8eaed] text-base lg:text-sm outline-none focus:border-[#8ab4f8]"
         />
         <button
           onClick={save}
           disabled={loading}
-          className="text-[#8ab4f8] hover:text-blue-300"
+          className="text-[#8ab4f8] hover:text-blue-300 p-1"
+          aria-label="Lưu"
         >
           <FiCheck className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={() => setEditing(false)}
-          className="text-[#9aa0a6] hover:text-[#e8eaed]"
+          className="text-[#9aa0a6] hover:text-[#e8eaed] p-1"
+          aria-label="Huỷ"
         >
           <FiX className="w-3.5 h-3.5" />
         </button>
@@ -184,7 +205,8 @@ function InlineEdit({
           setText(value);
           setEditing(true);
         }}
-        className="opacity-0 group-hover/edit:opacity-100 transition-opacity text-[#9aa0a6] hover:text-[#8ab4f8] flex-shrink-0"
+        className={`${REVEAL_ON_EDIT_HOVER} transition-opacity text-[#9aa0a6] hover:text-[#8ab4f8] flex-shrink-0 p-1.5 lg:p-0`}
+        aria-label="Đổi tên"
       >
         <FiEdit2 className="w-3 h-3" />
       </button>
@@ -240,8 +262,9 @@ function NewFolderModal({
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-[#2d2e30] rounded-2xl shadow-2xl w-96 p-6 border border-[#3c4043]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      {/* w-full max-w-sm (=24rem, đúng bằng w-96 cũ) để không tràn màn hình nhỏ */}
+      <div className="bg-[#2d2e30] rounded-2xl shadow-2xl w-full max-w-sm max-h-full overflow-y-auto p-5 sm:p-6 border border-[#3c4043]">
         <h3 className="text-[#e8eaed] font-medium text-base mb-4">{title}</h3>
         <input
           ref={inputRef}
@@ -252,7 +275,7 @@ function NewFolderModal({
             if (e.key === "Escape") onCancel();
           }}
           placeholder={placeholder}
-          className="w-full bg-transparent border-b-2 border-[#8ab4f8] text-[#e8eaed] text-sm py-2 outline-none placeholder-[#5f6368]"
+          className="w-full bg-transparent border-b-2 border-[#8ab4f8] text-[#e8eaed] text-base sm:text-sm py-2 outline-none placeholder-[#5f6368]"
         />
 
         {showAccessToggle && (
@@ -264,7 +287,7 @@ function NewFolderModal({
               <button
                 type="button"
                 onClick={() => setIsVip(true)}
-                className={`flex-1 flex items-center gap-2.5 px-4 py-3 rounded-xl border-2 transition-all ${
+                className={`flex-1 min-w-0 flex items-center gap-2.5 px-3 sm:px-4 py-3 rounded-xl border-2 transition-all ${
                   isVip
                     ? "border-amber-500 bg-amber-500/10"
                     : "border-[#3c4043] bg-transparent hover:border-[#5f6368]"
@@ -279,7 +302,7 @@ function NewFolderModal({
                     <div className="w-2 h-2 rounded-full bg-amber-500" />
                   )}
                 </div>
-                <div className="text-left">
+                <div className="text-left min-w-0">
                   <div className="flex items-center gap-1.5">
                     <FiLock className="w-3.5 h-3.5 text-amber-400" />
                     <span
@@ -297,7 +320,7 @@ function NewFolderModal({
               <button
                 type="button"
                 onClick={() => setIsVip(false)}
-                className={`flex-1 flex items-center gap-2.5 px-4 py-3 rounded-xl border-2 transition-all ${
+                className={`flex-1 min-w-0 flex items-center gap-2.5 px-3 sm:px-4 py-3 rounded-xl border-2 transition-all ${
                   !isVip
                     ? "border-emerald-500 bg-emerald-500/10"
                     : "border-[#3c4043] bg-transparent hover:border-[#5f6368]"
@@ -312,7 +335,7 @@ function NewFolderModal({
                     <div className="w-2 h-2 rounded-full bg-emerald-500" />
                   )}
                 </div>
-                <div className="text-left">
+                <div className="text-left min-w-0">
                   <div className="flex items-center gap-1.5">
                     <FiUnlock className="w-3.5 h-3.5 text-emerald-400" />
                     <span
@@ -434,6 +457,12 @@ export default function ResourceManage() {
     setUploadQueue([]);
     uploadQueueRef.current = [];
     loadFiles(sub.id);
+  };
+
+  // Quay về danh sách folder (dùng cho nút "Quay lại" trên mobile)
+  const backToFolders = () => {
+    setSelectedSub(null);
+    setFiles([]);
   };
 
   const toggleCat = (id: number) => {
@@ -606,11 +635,22 @@ export default function ResourceManage() {
 
   // ════════════════════════════════════════════════════════════════════
   // RENDER
+  //
+  // Bố cục:
+  //  - ≥ lg: 2 khung cạnh nhau (cây folder | danh sách file) như cũ.
+  //  - < lg: chỉ hiện 1 khung mỗi lúc. Chưa chọn folder con → hiện cây
+  //    folder toàn chiều rộng; chọn folder con → hiện danh sách file kèm
+  //    nút "Quay lại". (Dùng lg thay vì md vì đã có sidebar admin bên
+  //    ngoài chiếm chỗ, thêm sidebar 15rem nữa thì khung file quá hẹp.)
   // ════════════════════════════════════════════════════════════════════
   return (
-    <div className="h-full flex bg-[#202124] text-[#e8eaed] overflow-hidden rounded-xl">
+    <div className="h-full min-h-[60vh] flex bg-[#202124] text-[#e8eaed] overflow-hidden rounded-xl">
       {/* ── SIDEBAR ────────────────────────────────────────────────── */}
-      <aside className="w-60 flex-shrink-0 flex flex-col border-r border-[#3c4043] overflow-hidden">
+      <aside
+        className={`${
+          selectedSub ? "hidden lg:flex" : "flex"
+        } flex-col w-full lg:w-60 flex-shrink-0 lg:border-r border-[#3c4043] overflow-hidden`}
+      >
         <div className="px-4 pt-5 pb-3 flex items-center justify-between flex-shrink-0">
           <span className="text-sm font-semibold text-[#e8eaed]">
             Tài nguyên
@@ -618,7 +658,8 @@ export default function ResourceManage() {
           <button
             onClick={() => setShowNewCat(true)}
             title="Thêm folder gốc"
-            className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[#3c4043] text-[#9aa0a6] hover:text-[#e8eaed] transition-colors"
+            aria-label="Thêm folder gốc"
+            className="w-9 h-9 lg:w-7 lg:h-7 flex items-center justify-center rounded-full hover:bg-[#3c4043] text-[#9aa0a6] hover:text-[#e8eaed] transition-colors"
           >
             <FiFolderPlus className="w-4 h-4" />
           </button>
@@ -646,7 +687,7 @@ export default function ResourceManage() {
               return (
                 <div key={cat.id}>
                   <div
-                    className={`group flex items-center gap-1.5 px-2 py-1.5 rounded-full cursor-pointer transition-colors select-none ${
+                    className={`group flex items-center gap-1.5 px-2 py-2 lg:py-1.5 rounded-full cursor-pointer transition-colors select-none ${
                       isActiveCat && !selectedSub
                         ? "bg-[#394457] text-[#c2d9ff]"
                         : "hover:bg-[#2d2e30] text-[#9aa0a6] hover:text-[#e8eaed]"
@@ -657,7 +698,7 @@ export default function ResourceManage() {
                       className={`w-3.5 h-3.5 flex-shrink-0 transition-transform duration-150 ${isExpanded ? "rotate-90" : ""}`}
                     />
                     <div
-                      className="w-5 h-5 rounded flex-shrink-0 overflow-hidden flex items-center justify-center bg-[#3c4043] hover:ring-1 hover:ring-[#8ab4f8]"
+                      className="w-7 h-7 lg:w-5 lg:h-5 rounded flex-shrink-0 overflow-hidden flex items-center justify-center bg-[#3c4043] hover:ring-1 hover:ring-[#8ab4f8]"
                       onClick={(e) => {
                         e.stopPropagation();
                         thumbCatIdRef.current = cat.id;
@@ -672,7 +713,7 @@ export default function ResourceManage() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <FiImage className="w-3 h-3 text-[#9aa0a6]" />
+                        <FiImage className="w-4 h-4 lg:w-3 lg:h-3 text-[#9aa0a6]" />
                       )}
                     </div>
                     <span className="flex-1 text-sm min-w-0">
@@ -687,7 +728,7 @@ export default function ResourceManage() {
                         toggleCategoryAccess(cat);
                       }}
                       title={`Đang ${cat.isVip ? "VIP" : "FREE"} — nhấn để đổi`}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      className={`${REVEAL_ON_HOVER} transition-opacity`}
                     >
                       <AccessBadge isVip={cat.isVip ?? true} />
                     </button>
@@ -696,9 +737,10 @@ export default function ResourceManage() {
                         e.stopPropagation();
                         deleteCategory(cat.id);
                       }}
-                      className="opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center rounded-full hover:bg-red-500/20 text-[#9aa0a6] hover:text-red-400 flex-shrink-0 transition-all"
+                      aria-label="Xoá folder"
+                      className={`${REVEAL_ON_HOVER} w-8 h-8 lg:w-5 lg:h-5 flex items-center justify-center rounded-full hover:bg-red-500/20 text-[#9aa0a6] hover:text-red-400 flex-shrink-0 transition-all`}
                     >
-                      <FiTrash2 className="w-3 h-3" />
+                      <FiTrash2 className="w-3.5 h-3.5 lg:w-3 lg:h-3" />
                     </button>
                   </div>
 
@@ -708,7 +750,7 @@ export default function ResourceManage() {
                         <div
                           key={sub.id}
                           onClick={() => selectSub(cat, sub)}
-                          className={`group flex items-center gap-2 pl-2 pr-2 py-1.5 rounded-full cursor-pointer transition-colors select-none ${
+                          className={`group flex items-center gap-2 pl-2 pr-2 py-2 lg:py-1.5 rounded-full cursor-pointer transition-colors select-none ${
                             selectedSub?.id === sub.id
                               ? "bg-[#394457] text-[#c2d9ff]"
                               : "hover:bg-[#2d2e30] text-[#9aa0a6] hover:text-[#e8eaed]"
@@ -729,9 +771,10 @@ export default function ResourceManage() {
                               e.stopPropagation();
                               deleteSubFolder(sub.id);
                             }}
-                            className="opacity-0 group-hover:opacity-100 w-4 h-4 flex items-center justify-center rounded-full hover:bg-red-500/20 text-[#9aa0a6] hover:text-red-400 transition-all"
+                            aria-label="Xoá folder con"
+                            className={`${REVEAL_ON_HOVER} w-8 h-8 lg:w-4 lg:h-4 flex items-center justify-center rounded-full hover:bg-red-500/20 text-[#9aa0a6] hover:text-red-400 transition-all`}
                           >
-                            <FiTrash2 className="w-3 h-3" />
+                            <FiTrash2 className="w-3.5 h-3.5 lg:w-3 lg:h-3" />
                           </button>
                         </div>
                       ))}
@@ -741,7 +784,7 @@ export default function ResourceManage() {
                           setExpandedCats((p) => new Set(p).add(cat.id));
                           setShowNewSub(true);
                         }}
-                        className="flex items-center gap-2 pl-2 py-1.5 rounded-full w-full text-[#5f6368] hover:text-[#9aa0a6] hover:bg-[#2d2e30] transition-colors text-xs"
+                        className="flex items-center gap-2 pl-2 py-2 lg:py-1.5 rounded-full w-full text-[#5f6368] hover:text-[#9aa0a6] hover:bg-[#2d2e30] transition-colors text-xs"
                       >
                         <FiFolderPlus className="w-3.5 h-3.5" />
                         Thêm folder con
@@ -769,53 +812,71 @@ export default function ResourceManage() {
       </aside>
 
       {/* ── MAIN ───────────────────────────────────────────────────── */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="flex-shrink-0 flex items-center gap-3 px-5 py-3 border-b border-[#3c4043]">
-          <div className="flex items-center gap-1.5 text-sm flex-1 min-w-0">
-            <span
-              className="text-[#9aa0a6] hover:text-[#e8eaed] cursor-pointer transition-colors"
-              onClick={() => {
-                setSelectedCat(null);
-                setSelectedSub(null);
-                setFiles([]);
-              }}
-            >
-              Tài nguyên
-            </span>
-            {selectedCat && (
-              <>
-                <FiChevronRight className="w-3.5 h-3.5 text-[#5f6368] flex-shrink-0" />
-                <span
-                  className={`truncate transition-colors ${
-                    selectedSub
-                      ? "text-[#9aa0a6] hover:text-[#e8eaed] cursor-pointer"
-                      : "text-[#e8eaed] font-medium"
-                  }`}
-                  onClick={() => {
-                    if (selectedSub) {
-                      setSelectedSub(null);
-                      setFiles([]);
-                    }
-                  }}
-                >
-                  {selectedCat.name}
-                </span>
-                {!selectedSub && (
-                  <AccessBadge isVip={selectedCat.isVip ?? true} />
-                )}
-              </>
-            )}
+      <main
+        className={`${
+          selectedSub ? "flex" : "hidden lg:flex"
+        } flex-1 flex-col min-w-0 overflow-hidden`}
+      >
+        <header className="flex-shrink-0 flex flex-wrap items-center gap-x-3 gap-y-2 px-3 sm:px-5 py-3 border-b border-[#3c4043]">
+          {/* Hàng 1: nút quay lại (mobile) + breadcrumb */}
+          <div className="flex items-center gap-2 min-w-0 basis-full lg:basis-0 lg:flex-1">
             {selectedSub && (
-              <>
-                <FiChevronRight className="w-3.5 h-3.5 text-[#5f6368] flex-shrink-0" />
-                <span className="text-[#e8eaed] font-medium truncate">
-                  {selectedSub.name}
-                </span>
-              </>
+              <button
+                onClick={backToFolders}
+                aria-label="Quay lại danh sách folder"
+                className="lg:hidden shrink-0 -ml-1 w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#3c4043] text-[#9aa0a6] hover:text-[#e8eaed] transition-colors"
+              >
+                <FiChevronLeft className="w-5 h-5" />
+              </button>
             )}
+
+            <div className="flex items-center gap-1.5 text-sm flex-1 min-w-0">
+              <span
+                className="hidden sm:inline text-[#9aa0a6] hover:text-[#e8eaed] cursor-pointer transition-colors"
+                onClick={() => {
+                  setSelectedCat(null);
+                  setSelectedSub(null);
+                  setFiles([]);
+                }}
+              >
+                Tài nguyên
+              </span>
+              {selectedCat && (
+                <>
+                  <FiChevronRight className="hidden sm:block w-3.5 h-3.5 text-[#5f6368] flex-shrink-0" />
+                  <span
+                    className={`truncate transition-colors ${
+                      selectedSub
+                        ? "text-[#9aa0a6] hover:text-[#e8eaed] cursor-pointer"
+                        : "text-[#e8eaed] font-medium"
+                    }`}
+                    onClick={() => {
+                      if (selectedSub) {
+                        setSelectedSub(null);
+                        setFiles([]);
+                      }
+                    }}
+                  >
+                    {selectedCat.name}
+                  </span>
+                  {!selectedSub && (
+                    <AccessBadge isVip={selectedCat.isVip ?? true} />
+                  )}
+                </>
+              )}
+              {selectedSub && (
+                <>
+                  <FiChevronRight className="w-3.5 h-3.5 text-[#5f6368] flex-shrink-0" />
+                  <span className="text-[#e8eaed] font-medium truncate">
+                    {selectedSub.name}
+                  </span>
+                </>
+              )}
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Hàng 2 (mobile) / cùng hàng (desktop): các nút thao tác */}
+          <div className="flex items-center gap-2 w-full justify-between lg:w-auto lg:justify-end flex-shrink-0">
             {selectedCat && !selectedSub && (
               <button
                 onClick={() => toggleCategoryAccess(selectedCat)}
@@ -842,16 +903,18 @@ export default function ResourceManage() {
                 Tải lên
               </button>
             )}
-            <div className="flex items-center bg-[#2d2e30] rounded-full p-0.5 border border-[#3c4043]">
+            <div className="flex items-center bg-[#2d2e30] rounded-full p-0.5 border border-[#3c4043] ml-auto lg:ml-0">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-1.5 rounded-full transition-colors ${viewMode === "grid" ? "bg-[#394457] text-[#8ab4f8]" : "text-[#9aa0a6] hover:text-[#e8eaed]"}`}
+                aria-label="Xem dạng lưới"
+                className={`p-2 lg:p-1.5 rounded-full transition-colors ${viewMode === "grid" ? "bg-[#394457] text-[#8ab4f8]" : "text-[#9aa0a6] hover:text-[#e8eaed]"}`}
               >
                 <FiGrid className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-1.5 rounded-full transition-colors ${viewMode === "list" ? "bg-[#394457] text-[#8ab4f8]" : "text-[#9aa0a6] hover:text-[#e8eaed]"}`}
+                aria-label="Xem dạng danh sách"
+                className={`p-2 lg:p-1.5 rounded-full transition-colors ${viewMode === "list" ? "bg-[#394457] text-[#8ab4f8]" : "text-[#9aa0a6] hover:text-[#e8eaed]"}`}
               >
                 <FiList className="w-3.5 h-3.5" />
               </button>
@@ -872,9 +935,9 @@ export default function ResourceManage() {
           />
         </header>
 
-        <div className="flex-1 overflow-y-auto p-5">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-5">
           {!selectedSub ? (
-            <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
+            <div className="flex flex-col items-center justify-center h-full min-h-[50vh] gap-3 text-center">
               <div className="w-16 h-16 rounded-full bg-[#2d2e30] flex items-center justify-center">
                 <FiFolder className="w-7 h-7 text-[#5f6368]" />
               </div>
@@ -886,7 +949,7 @@ export default function ResourceManage() {
             </div>
           ) : loadingFiles ? (
             viewMode === "grid" ? (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+              <div className={FILE_GRID}>
                 {[...Array(12)].map((_, i) => (
                   <div
                     key={i}
@@ -907,7 +970,7 @@ export default function ResourceManage() {
               </div>
             )
           ) : files.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
+            <div className="flex flex-col items-center justify-center h-full min-h-[50vh] gap-3 text-center">
               <div className="w-16 h-16 rounded-full bg-[#2d2e30] flex items-center justify-center">
                 <FiUpload className="w-7 h-7 text-[#5f6368]" />
               </div>
@@ -928,7 +991,7 @@ export default function ResourceManage() {
               </button>
             </div>
           ) : viewMode === "grid" ? (
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+            <div className={FILE_GRID}>
               {files.map((file) => {
                 const color = getFileColor(file.fileType);
                 return (
@@ -950,21 +1013,25 @@ export default function ResourceManage() {
                         {formatBytes(file.fileSize)}
                       </p>
                     </div>
-                    <div className="absolute inset-0 bg-[#202124]/0 group-hover:bg-[#202124]/40 transition-colors rounded-xl" />
-                    <div className="absolute top-1.5 right-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute inset-0 bg-[#202124]/0 group-hover:bg-[#202124]/40 transition-colors rounded-xl pointer-events-none" />
+                    <div
+                      className={`${REVEAL_ON_HOVER} absolute top-1.5 right-1.5 flex gap-1 transition-opacity`}
+                    >
                       <button
                         onClick={() =>
                           downloadFile(file.fileUrl, file.fileName)
                         }
-                        className="w-6 h-6 flex items-center justify-center rounded-full bg-[#2d2e30]/90 text-[#9aa0a6] hover:text-[#8ab4f8] transition-colors"
+                        className="w-7 h-7 lg:w-6 lg:h-6 flex items-center justify-center rounded-full bg-[#2d2e30]/90 text-[#9aa0a6] hover:text-[#8ab4f8] transition-colors"
                         title="Tải xuống"
+                        aria-label="Tải xuống"
                       >
                         <FiDownload className="w-3 h-3" />
                       </button>
                       <button
                         onClick={() => deleteFile(file.id)}
-                        className="w-6 h-6 flex items-center justify-center rounded-full bg-[#2d2e30]/90 text-[#9aa0a6] hover:text-red-400 transition-colors"
+                        className="w-7 h-7 lg:w-6 lg:h-6 flex items-center justify-center rounded-full bg-[#2d2e30]/90 text-[#9aa0a6] hover:text-red-400 transition-colors"
                         title="Xoá"
+                        aria-label="Xoá"
                       >
                         <FiTrash2 className="w-3 h-3" />
                       </button>
@@ -975,12 +1042,15 @@ export default function ResourceManage() {
             </div>
           ) : (
             <div className="rounded-xl border border-[#3c4043] overflow-hidden">
-              <div className="grid grid-cols-[2rem_1fr_9rem_7rem_5rem_5rem] gap-3 px-4 py-2 bg-[#2d2e30] border-b border-[#3c4043] text-xs text-[#9aa0a6] font-medium uppercase tracking-wider">
+              {/* Tiêu đề cột: chỉ hiện đủ 6 cột ở màn hình xl */}
+              <div
+                className={`grid ${LIST_COLS} gap-3 px-3 sm:px-4 py-2 bg-[#2d2e30] border-b border-[#3c4043] text-xs text-[#9aa0a6] font-medium uppercase tracking-wider`}
+              >
                 <span />
                 <span>Tên</span>
-                <span>File gốc</span>
-                <span>Dung lượng</span>
-                <span>Lượt tải</span>
+                <span className="hidden xl:block">File gốc</span>
+                <span className="hidden xl:block">Dung lượng</span>
+                <span className="hidden xl:block">Lượt tải</span>
                 <span />
               </div>
               {files.map((file, idx) => {
@@ -988,7 +1058,7 @@ export default function ResourceManage() {
                 return (
                   <div
                     key={file.id}
-                    className={`group grid grid-cols-[2rem_1fr_9rem_7rem_5rem_5rem] gap-3 items-center px-4 py-2.5 hover:bg-[#2d2e30] transition-colors ${
+                    className={`group grid ${LIST_COLS} gap-3 items-center px-3 sm:px-4 py-2.5 hover:bg-[#2d2e30] transition-colors ${
                       idx !== files.length - 1
                         ? "border-b border-[#3c4043]/50"
                         : ""
@@ -999,35 +1069,49 @@ export default function ResourceManage() {
                     >
                       <FileTypeIcon type={file.fileType} size="sm" />
                     </div>
-                    <span
-                      className="text-sm text-[#e8eaed] truncate"
-                      title={file.name}
-                    >
-                      {file.name}
-                    </span>
-                    <span className="text-xs text-[#9aa0a6] truncate">
+
+                    {/* Tên + (dưới xl) dòng thông tin phụ ngay bên dưới tên */}
+                    <div className="min-w-0">
+                      <p
+                        className="text-sm text-[#e8eaed] truncate"
+                        title={file.name}
+                      >
+                        {file.name}
+                      </p>
+                      <p className="xl:hidden text-[11px] text-[#9aa0a6] truncate">
+                        {formatBytes(file.fileSize)} · {file.downloadCount} lượt
+                        tải
+                      </p>
+                    </div>
+
+                    <span className="hidden xl:block text-xs text-[#9aa0a6] truncate">
                       {file.fileName}
                     </span>
-                    <span className="text-xs text-[#9aa0a6]">
+                    <span className="hidden xl:block text-xs text-[#9aa0a6]">
                       {formatBytes(file.fileSize)}
                     </span>
-                    <span className="text-xs text-[#9aa0a6]">
+                    <span className="hidden xl:block text-xs text-[#9aa0a6]">
                       {file.downloadCount}
                     </span>
-                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+
+                    <div
+                      className={`${REVEAL_ON_HOVER} flex items-center justify-end gap-1 transition-opacity`}
+                    >
                       <button
                         onClick={() =>
                           downloadFile(file.fileUrl, file.fileName)
                         }
-                        className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[#394457] text-[#9aa0a6] hover:text-[#8ab4f8] transition-colors"
+                        className="w-8 h-8 lg:w-7 lg:h-7 flex items-center justify-center rounded-full hover:bg-[#394457] text-[#9aa0a6] hover:text-[#8ab4f8] transition-colors"
                         title="Tải xuống"
+                        aria-label="Tải xuống"
                       >
                         <FiDownload className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => deleteFile(file.id)}
-                        className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-red-500/15 text-[#9aa0a6] hover:text-red-400 transition-colors"
+                        className="w-8 h-8 lg:w-7 lg:h-7 flex items-center justify-center rounded-full hover:bg-red-500/15 text-[#9aa0a6] hover:text-red-400 transition-colors"
                         title="Xoá"
+                        aria-label="Xoá"
                       >
                         <FiTrash2 className="w-3.5 h-3.5" />
                       </button>
@@ -1042,7 +1126,7 @@ export default function ResourceManage() {
 
       {/* ── UPLOAD QUEUE WIDGET ─────────────────────────────────────── */}
       {uploadQueue.length > 0 && (
-        <div className="fixed bottom-6 right-6 z-40 w-80 rounded-2xl shadow-2xl border border-[#3c4043] bg-[#2d2e30] overflow-hidden">
+        <div className="fixed bottom-3 left-3 right-3 sm:left-auto sm:bottom-6 sm:right-6 sm:w-80 z-40 rounded-2xl shadow-2xl border border-[#3c4043] bg-[#2d2e30] overflow-hidden">
           <div
             className="flex items-center justify-between px-4 py-3 bg-[#3c4043] cursor-pointer select-none"
             onClick={() => setShowQueue((p) => !p)}
@@ -1064,6 +1148,7 @@ export default function ResourceManage() {
                   if (activeUploads === 0) setUploadQueue([]);
                   else clearDoneQueue();
                 }}
+                aria-label="Đóng"
                 className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#5f6368]/50 text-[#9aa0a6] hover:text-[#e8eaed] transition-colors"
               >
                 <FiX className="w-3.5 h-3.5" />
@@ -1101,7 +1186,8 @@ export default function ResourceManage() {
                             prev.filter((i) => i.id !== item.id),
                           )
                         }
-                        className="text-[#5f6368] hover:text-red-400 transition-colors"
+                        className="text-[#5f6368] hover:text-red-400 transition-colors p-1"
+                        aria-label="Bỏ khỏi hàng đợi"
                       >
                         <FiX className="w-3 h-3" />
                       </button>
