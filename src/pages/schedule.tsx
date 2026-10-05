@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState, Fragment } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  Fragment,
+  type CSSProperties,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -159,6 +165,97 @@ const clampWeekStart = (d: Date): Date => {
   return monday;
 };
 
+// ─── Animation (CSS thuần, không cần sửa tailwind.config) ───────────────
+const DROP_IN_CSS = `
+@keyframes dropIn {
+  0%   { opacity: 0; transform: translateY(-18px) scale(0.97); }
+  60%  { opacity: 1; transform: translateY(3px) scale(1); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-drop-in { animation: dropIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fadeUp 0.4s ease-out backwards; }
+
+/* Tiêu đề: chữ giãn dần rồi co lại */
+@keyframes titleIn {
+  from { opacity: 0; letter-spacing: 0.3em; transform: translateY(-10px); }
+  to   { opacity: 1; letter-spacing: 0.025em; transform: translateY(0); }
+}
+.animate-title { animation: titleIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+
+/* Header các thứ: lật xuống */
+@keyframes flipDown {
+  from { opacity: 0; transform: perspective(400px) rotateX(-70deg); }
+  to   { opacity: 1; transform: perspective(400px) rotateX(0); }
+}
+.animate-flip-down { animation: flipDown 0.5s ease-out backwards; transform-origin: top; }
+
+/* Nhãn Sáng/Chiều/Tối: trượt từ trái vào */
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-left { animation: slideLeft 0.5s ease-out backwards; }
+
+/* Cột hôm nay: phát sáng nhẹ liên tục */
+@keyframes todayGlow {
+  0%, 100% { box-shadow: inset 0 0 0 0 rgba(250, 204, 21, 0); }
+  50%      { box-shadow: inset 0 0 22px 0 rgba(250, 204, 21, 0.12); }
+}
+.today-col { animation: todayGlow 3s ease-in-out infinite; }
+
+/* Thẻ buổi học: hover nhấc lên + vệt sáng quét qua sau khi rơi xuống */
+.session-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.session-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
+}
+.session-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.14) 50%, transparent 60%);
+  transform: translateX(-100%);
+  animation: shine 0.9s ease-out;
+  animation-delay: var(--shine-delay, 0ms);
+}
+@keyframes shine { to { transform: translateX(100%); } }
+
+/* Chuông lắc */
+@keyframes bellRing {
+  0%, 60%, 100% { transform: rotate(0); }
+  10% { transform: rotate(16deg); }
+  20% { transform: rotate(-14deg); }
+  30% { transform: rotate(10deg); }
+  40% { transform: rotate(-8deg); }
+  50% { transform: rotate(4deg); }
+}
+.animate-bell { animation: bellRing 2.4s ease-in-out infinite; transform-origin: top center; }
+
+/* Dấu tick "Đã đánh giá" bật ra */
+@keyframes popIn {
+  0%   { transform: scale(0); }
+  70%  { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+.animate-pop { animation: popIn 0.4s ease-out backwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-drop-in, .animate-fade-up, .animate-title, .animate-flip-down,
+  .animate-slide-left, .today-col, .animate-bell, .animate-pop,
+  .session-card::after { animation: none; }
+}
+`;
+
 export default function MySchedule() {
   const navigate = useNavigate();
   const [items, setItems] = useState<LocalItem[]>([]);
@@ -270,6 +367,7 @@ export default function MySchedule() {
 
   return (
     <div className="min-h-screen bg-black p-6">
+      <style>{DROP_IN_CSS}</style>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* ====== HEADER ====== */}
         <div className="text-center">
@@ -280,10 +378,13 @@ export default function MySchedule() {
             <ArrowLeft className="w-4 h-4" />
             Quay lại
           </button>
-          <h2 className="text-3xl sm:text-4xl font-bold text-yellow-400 tracking-wide">
+          <h2 className="animate-title text-3xl sm:text-4xl font-bold text-yellow-400 tracking-wide">
             THỜI KHÓA BIỂU
           </h2>
-          <p className="text-gray-400 text-sm mt-1">
+          <p
+            className="animate-fade-up text-gray-400 text-sm mt-1"
+            style={{ animationDelay: "250ms" }}
+          >
             {loading
               ? "Đang tải..."
               : `${items.length} buổi trong tuần ${formatShortDate(weekStart)} – ${formatShortDate(weekEnd)}`}
@@ -296,7 +397,7 @@ export default function MySchedule() {
               disabled={enablingNotif}
               className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-yellow-400/10 border border-yellow-400/30 text-yellow-300 hover:bg-yellow-400/20 transition-all disabled:opacity-50"
             >
-              <Bell className="w-3.5 h-3.5" />
+              <Bell className="animate-bell w-3.5 h-3.5" />
               {enablingNotif
                 ? "Đang bật..."
                 : "Bật thông báo nhắc trước 1 tiếng"}
@@ -317,7 +418,7 @@ export default function MySchedule() {
         </div>
 
         {/* ====== THANH CHỌN TUẦN ====== */}
-        <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 flex flex-wrap items-center gap-3">
+        <div className="animate-fade-up bg-gray-900 border border-gray-700 rounded-xl p-4 flex flex-wrap items-center gap-3">
           <button
             onClick={goPrevWeek}
             disabled={!canGoPrevWeek}
@@ -365,8 +466,14 @@ export default function MySchedule() {
         {/* ====== BẢNG THỜI KHÓA BIỂU ====== */}
         <div className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden">
           {loading ? (
-            <div className="p-10 text-center text-gray-500 text-sm">
-              Đang tải thời khóa biểu...
+            <div className="p-6 grid grid-cols-7 gap-3">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-28 rounded-lg bg-gray-800 animate-pulse"
+                  style={{ animationDelay: `${i * 100}ms` }}
+                />
+              ))}
             </div>
           ) : (
             <>
@@ -382,19 +489,29 @@ export default function MySchedule() {
                       Buổi
                     </span>
                   </div>
-                  {WEEKDAY_LABELS.map((label, i) => (
-                    <div
-                      key={label}
-                      className="p-4 text-center border-l border-b border-gray-800"
-                    >
-                      <span className="text-sm font-semibold text-white block">
-                        {label}
-                      </span>
-                      <span className="text-[11px] text-gray-500">
-                        {formatShortDate(weekDates[i])}
-                      </span>
-                    </div>
-                  ))}
+                  {WEEKDAY_LABELS.map((label, i) => {
+                    const isToday = toDateInputValue(weekDates[i]) === todayStr;
+                    return (
+                      <div
+                        key={label}
+                        style={{ animationDelay: `${i * 70}ms` }}
+                        className={`animate-flip-down p-4 text-center border-l border-b border-gray-800 ${
+                          isToday ? "today-col bg-yellow-400/5" : ""
+                        }`}
+                      >
+                        <span
+                          className={`text-sm font-semibold block ${
+                            isToday ? "text-yellow-400" : "text-white"
+                          }`}
+                        >
+                          {label}
+                        </span>
+                        <span className="text-[11px] text-gray-500">
+                          {formatShortDate(weekDates[i])}
+                        </span>
+                      </div>
+                    );
+                  })}
 
                   {/* Các dòng Sáng / Chiều / Tối — cùng chung 1 grid với
                       header ở trên, đảm bảo cột luôn thẳng hàng tuyệt đối. */}
@@ -408,7 +525,8 @@ export default function MySchedule() {
                     return (
                       <Fragment key={session.key}>
                         <div
-                          className={`p-4 flex flex-col gap-1 justify-center bg-gray-900/60 ${borderCls}`}
+                          style={{ animationDelay: `${sIdx * 120}ms` }}
+                          className={`animate-slide-left p-4 flex flex-col gap-1 justify-center bg-gray-900/60 ${borderCls}`}
                         >
                           <div className="flex items-center gap-1.5 text-gray-200">
                             <Icon className="w-3.5 h-3.5 text-yellow-400" />
@@ -418,14 +536,17 @@ export default function MySchedule() {
                           </div>
                         </div>
 
-                        {weekDates.map((date) => {
+                        {weekDates.map((date, dayIdx) => {
                           const dateStr = toDateInputValue(date);
                           const key = `${dateStr}-${session.key}`;
                           const cellItems = grid[key] ?? [];
+                          const isToday = dateStr === todayStr;
                           return (
                             <div
                               key={key}
-                              className={`p-2 border-l border-gray-800 min-h-[92px] flex flex-col gap-1.5 ${borderCls}`}
+                              className={`p-2 border-l border-gray-800 min-h-[92px] flex flex-col gap-1.5 ${borderCls} ${
+                                isToday ? "today-col bg-yellow-400/[0.03]" : ""
+                              }`}
                             >
                               {cellItems.length === 0 ? (
                                 <div className="flex-1 flex items-center justify-center">
@@ -434,14 +555,23 @@ export default function MySchedule() {
                                   </span>
                                 </div>
                               ) : (
-                                cellItems.map((item) => {
+                                cellItems.map((item, itemIdx) => {
                                   const t = TYPES[item.type];
                                   const isDone = submittedIds.has(item.id);
                                   const canShowButton = item.date <= todayStr;
+                                  // Thứ tự rơi: theo dòng (Sáng→Tối) + cột (T2→CN) + vị trí trong ô
+                                  const delay =
+                                    sIdx * 120 + dayIdx * 60 + itemIdx * 80;
                                   return (
                                     <div
                                       key={item.id}
-                                      className={`rounded-lg border ${t.border} ${t.bg} px-2.5 py-1.5`}
+                                      style={
+                                        {
+                                          animationDelay: `${delay}ms`,
+                                          "--shine-delay": `${delay + 350}ms`,
+                                        } as CSSProperties
+                                      }
+                                      className={`animate-drop-in session-card rounded-lg border ${t.border} ${t.bg} px-2.5 py-1.5`}
                                     >
                                       <p
                                         className={`text-xs font-semibold ${t.text} leading-snug`}
@@ -467,7 +597,7 @@ export default function MySchedule() {
                                       {canShowButton &&
                                         (isDone ? (
                                           <div className="flex items-center gap-1 mt-1.5 text-[10px] font-medium text-gray-500">
-                                            <CheckCircle2 className="w-3 h-3" />
+                                            <CheckCircle2 className="animate-pop w-3 h-3" />
                                             Đã đánh giá
                                           </div>
                                         ) : (
