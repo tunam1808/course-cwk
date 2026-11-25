@@ -12,6 +12,7 @@ import Home from "@/pages/home";
 import FreeCourses from "@/pages/free-courses";
 import VipSources from "@/pages/vip-sources";
 import Contact from "@/pages/contact";
+import Promotional from "@/pages//promotional-page";
 import ListCourses from "./pages/list-courses";
 import LessonCapcut from "./layout/courses-premium/course-capcut/lesson-capcut";
 import LessonBds from "./layout/courses-premium/course-bds/lesson-bds";
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/free-courses" element={<FreeCourses />} />
         <Route path="/vip-sources" element={<VipSources />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/promotional-page" element={<Promotional />} />
 
         {/* Guest only — chưa đăng nhập mới vào được */}
         <Route element={<GuestRoute />}>

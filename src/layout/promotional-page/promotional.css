@@ -1,0 +1,380 @@
+@import "@fontsource-variable/inter/opsz.css";
+
+/* Màu và font của trang promotional, khai báo thành theme Tailwind.
+   Font đặt tên --font-promo để không đè font-sans của project chính. */
+@theme {
+  --color-navy: #001b42;
+  --color-navy-2: #0b2b5e;
+  --color-yellow: #fff200;
+  --color-gray: #f5f5f7;
+  --color-ink: #1d1d1f;
+  --color-ink-2: #6e6e73;
+  --color-ink-3: #86868b;
+  --color-line: #d2d2d7;
+  --color-link: #0066cc;
+  --color-link-dark: #2997ff;
+  --font-promo:
+    "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer base {
+  /* Cuộn mượt chỉ khi đang ở trang promotional */
+  html:has(.promo) {
+    scroll-behavior: smooth;
+  }
+
+  /* Thay cho body của bản mẫu */
+  .promo {
+    color-scheme: light;
+    background: #fff;
+    color: var(--color-ink);
+    font-family: var(--font-promo);
+    font-size: 17px;
+    line-height: 1.47;
+    letter-spacing: -0.022em;
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 76px;
+  }
+  /* Thay cho body::before (che vùng tai thỏ trên iPhone) */
+  .promo::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    z-index: 30;
+    background: rgba(251, 251, 253, 0.86);
+  }
+  .promo :is(h1, h2, h3) {
+    font-weight: 600;
+    text-wrap: balance;
+  }
+  .promo :is(a, button):focus-visible {
+    outline: 3px solid var(--color-link-dark);
+    outline-offset: 3px;
+    border-radius: 12px;
+  }
+}
+
+/* Những thứ Tailwind khó diễn tả gọn: cỡ chữ clamp, nút, kính mờ, phần tử giả, keyframes */
+@layer components {
+  .promo .wrap {
+    padding-left: max(22px, env(safe-area-inset-left, 0px));
+    padding-right: max(22px, env(safe-area-inset-right, 0px));
+  }
+  .promo .glass {
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
+  .promo .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .promo .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Thang cỡ chữ */
+  .promo .eyebrow {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-ink-2);
+  }
+  .promo .hero-h {
+    font-size: clamp(44px, 8.4vw, 80px);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    font-weight: 700;
+  }
+  .promo .sec-h {
+    font-size: clamp(34px, 6vw, 56px);
+    line-height: 1.07;
+    letter-spacing: -0.005em;
+    font-weight: 600;
+  }
+  .promo .sub {
+    font-size: clamp(19px, 2.6vw, 24px);
+    line-height: 1.3;
+    letter-spacing: 0.005em;
+    font-weight: 500;
+    color: var(--color-ink-2);
+  }
+  .promo .body-l {
+    font-size: clamp(17px, 2vw, 21px);
+    line-height: 1.42;
+    color: var(--color-ink-2);
+    max-width: 42ch;
+  }
+  .promo .fine {
+    font-size: 12px;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    color: var(--color-ink-3);
+  }
+
+  /* Nút và link */
+  .promo .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 980px;
+    padding: 11px 22px;
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: -0.022em;
+    transition:
+      background 0.25s,
+      transform 0.2s;
+  }
+  .promo .pill-navy {
+    background: var(--color-navy);
+    color: #fff;
+  }
+  .promo .pill-navy:hover {
+    background: var(--color-navy-2);
+  }
+  .promo .pill-yellow {
+    background: var(--color-yellow);
+    color: var(--color-navy);
+  }
+  .promo .pill-yellow:hover {
+    filter: brightness(0.96);
+  }
+  .promo .pill:active {
+    transform: scale(0.97);
+  }
+  .promo .more {
+    color: var(--color-link);
+    font-size: 17px;
+  }
+  .promo .more::after {
+    content: " ›";
+    font-size: 1.05em;
+  }
+  .promo .more:hover {
+    text-decoration: underline;
+  }
+
+  /* Showreel */
+  .promo .showreel-bg {
+    background: radial-gradient(
+      120% 90% at 50% 10%,
+      #0b2b5e 0%,
+      #001b42 45%,
+      #000814 100%
+    );
+  }
+  .promo .glow {
+    background: radial-gradient(
+      50% 50% at 50% 50%,
+      rgba(255, 242, 0, 0.18),
+      transparent 70%
+    );
+    animation: promo-glow 4s ease-in-out infinite;
+  }
+
+  /* Thanh chọn ngành + thẻ video */
+  .promo .seg-btn {
+    flex: none;
+    border: 0;
+    background: transparent;
+    color: #a1a1a6;
+    font: 500 14px var(--font-promo);
+    letter-spacing: -0.01em;
+    padding: 9px 18px;
+    border-radius: 980px;
+    cursor: pointer;
+    transition:
+      background 0.3s,
+      color 0.3s;
+  }
+  .promo .seg-btn[aria-pressed="true"] {
+    background: #f5f5f7;
+    color: #1d1d1f;
+  }
+  .promo .reel-v {
+    aspect-ratio: 9/16;
+    border-radius: 24px;
+    background: linear-gradient(160deg, #2a2a2d, #141416);
+    display: grid;
+    place-items: center;
+    text-align: center;
+    color: #86868b;
+    font-size: 13px;
+    padding: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .promo .reel-v::before {
+    content: "";
+    position: absolute;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    top: calc(50% - 50px);
+  }
+  .promo .reel-v::after {
+    content: "";
+    position: absolute;
+    top: calc(50% - 32px);
+    left: calc(50% - 6px);
+    border-left: 16px solid #f5f5f7;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+  }
+  .promo .reel-v span {
+    margin-top: 90px;
+  }
+  .promo .swap {
+    animation: promo-swap 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+  }
+
+  /* Hiện lúc tải trang + hiện khi cuộn */
+  .promo .rise {
+    animation: promo-rise 1s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+  }
+  .promo .d1 {
+    animation-delay: 0.08s;
+  }
+  .promo .d2 {
+    animation-delay: 0.16s;
+  }
+  .promo .d3 {
+    animation-delay: 0.24s;
+  }
+  .promo .hero-h .ln {
+    display: inline-block;
+    animation: promo-blur-in 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .promo .hero-h .ln:nth-child(3) {
+    animation-delay: 0.25s;
+  }
+  .promo .reveal {
+    transition:
+      opacity 1s cubic-bezier(0.25, 0.1, 0.25, 1),
+      transform 1s cubic-bezier(0.25, 0.1, 0.25, 1),
+      filter 1s;
+    transition-delay: var(--d, 0s);
+  }
+  .promo .reveal.pre {
+    opacity: 0;
+    transform: translateY(48px);
+    filter: blur(8px);
+  }
+  .promo .phone-scale {
+    transition: transform 0.1s linear;
+    will-change: transform;
+  }
+
+  /* Vệt vàng quét qua khối cuối */
+  .promo .streak {
+    position: absolute;
+    left: -30%;
+    top: 22%;
+    width: 60%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--color-yellow));
+    transform: rotate(-8deg);
+    opacity: 0;
+  }
+  .promo .go .streak {
+    animation: promo-streak 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both;
+  }
+
+  /* Thanh Zalo ở đáy trượt lên sau khi qua phần đầu */
+  .promo .bar {
+    transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  .promo .bar:not(.on) {
+    transform: translateY(110%);
+  }
+
+  /* Ô có phản hồi khi rê chuột (thứ tự: .plan đứng sau .reveal như bản mẫu) */
+  .promo .plan {
+    transition:
+      transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+      opacity 1s,
+      filter 1s;
+  }
+  @media (hover: hover) {
+    .promo .plan:hover {
+      transform: translateY(-6px);
+    }
+    .promo .tile,
+    .promo .term {
+      transition: transform 0.5s;
+    }
+    .promo .tile:hover,
+    .promo .term:hover {
+      transform: scale(1.02);
+    }
+  }
+}
+
+@keyframes promo-swap {
+  from {
+    opacity: 0.2;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes promo-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes promo-blur-in {
+  from {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+@keyframes promo-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes promo-streak {
+  0% {
+    opacity: 0;
+    transform: translateX(0) rotate(-8deg);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(260%) rotate(-8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo * {
+    animation: none !important;
+    transition: none !important;
+  }
+  html:has(.promo) {
+    scroll-behavior: auto;
+  }
+}

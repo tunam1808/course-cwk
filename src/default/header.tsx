@@ -9,6 +9,7 @@ const navItems = [
   { label: "Các khóa học", href: "/list-courses" },
   { label: "Tài nguyên", href: "/vip-sources" },
   { label: "Liên hệ", href: "/contact" },
+  { label: "Các gói", href: "/promotional-page" },
 ] as const;
 
 export default function Navbar() {
