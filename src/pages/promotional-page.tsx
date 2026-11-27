@@ -9,7 +9,6 @@ import Stats from "@/layout/promotional-page/Stats";
 import StickyBar from "@/layout/promotional-page/StickyBar";
 import Terms from "@/layout/promotional-page/Terms";
 import Videos from "@/layout/promotional-page/Videos";
-import { NGANH } from "@/data/mock";
 import { useReveal } from "@/hooks/useReveal";
 
 export default function Promotional() {
@@ -20,7 +19,7 @@ export default function Promotional() {
       <main>
         <Hero />
         <Pain />
-        <Videos nganh={NGANH} />
+        <Videos />
         <Stats />
         <Feedback />
         <Pricing />
