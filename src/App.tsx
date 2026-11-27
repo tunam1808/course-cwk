@@ -22,6 +22,7 @@ import ManagePage from "@/admin/manage-page";
 import AccountManage from "@/admin/acount-manage";
 import CoursesManage from "@/admin/courses-manage";
 import IntroManage from "@/admin/intro-manage";
+import LandingPage from "@/admin/landingpage-new";
 import CountdownManage from "@/admin/countdown-manage";
 import ResourceManage from "@/admin/resource-manage";
 import ScheduleManage from "@/admin/schedule-manage";
@@ -68,6 +69,7 @@ export default function App() {
             <Route path="account" element={<AccountManage />} />
             <Route path="courses" element={<CoursesManage />} />
             <Route path="intro-manage" element={<IntroManage />} />
+            <Route path="landingpage-new" element={<LandingPage />} />
             <Route path="countdown-manage" element={<CountdownManage />} />
             <Route path="resource-manage" element={<ResourceManage />} />
             <Route path="schedule-manage" element={<ScheduleManage />} />

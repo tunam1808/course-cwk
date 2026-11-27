@@ -1,30 +1,46 @@
-import { FEEDBACK_MAU } from "@/data/mock";
+import { useEffect, useState } from "react";
+import { feedbackApi, type FeedbackImage } from "@/api/feedback.api";
 
 export default function Feedback() {
+  const [images, setImages] = useState<FeedbackImage[]>([]);
+
+  useEffect(() => {
+    let ignore = false;
+    feedbackApi
+      .getAll()
+      .then((data) => {
+        if (!ignore) setImages(data);
+      })
+      .catch((error) => {
+        console.error("[Feedback] Không tải được ảnh:", error);
+      });
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
   return (
     <section
       className="wrap bg-gray py-24 text-center max-[640px]:py-[72px]"
       aria-labelledby="fb-h"
+      hidden={images.length === 0} // chưa có ảnh thì ẩn cả khối
     >
       <div className="mx-auto max-w-[1024px]">
         <h2 className="sec-h reveal" id="fb-h">
           Khách nói gì.
         </h2>
-        <div
-          className="mt-14 grid grid-cols-[repeat(3,1fr)] gap-5 max-[760px]:grid-cols-[1fr_1fr] max-[760px]:[&>div:nth-child(3)]:hidden"
-          data-stagger
-        >
-          {FEEDBACK_MAU.map((note) => (
+        <div className="mt-14 grid grid-cols-[repeat(3,1fr)] gap-5 max-[760px]:grid-cols-[1fr_1fr]">
+          {images.map((image, i) => (
             <div
-              key={note}
-              className="reveal grid aspect-[3/4] place-items-center rounded-[28px] border border-dashed border-line bg-white p-4 text-center text-[14px] text-ink-3"
+              key={image.id}
+              className="aspect-[3/4] overflow-hidden rounded-[28px] border border-line bg-white"
             >
-              <div>
-                <b className="mb-1 block font-semibold text-ink">
-                  Ảnh feedback
-                </b>
-                {note}
-              </div>
+              <img
+                src={image.imageUrl}
+                alt={`Feedback của khách hàng ${i + 1}`}
+                loading="lazy"
+                className="h-full w-full object-contain"
+              />
             </div>
           ))}
         </div>

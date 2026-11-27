@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { newPageApi } from "@/api/landingpage-intro.api";
 import { useShowreelScale } from "@/hooks/useShowreelScale";
 import ZaloLink from "./ZaloLink";
 
@@ -6,6 +7,23 @@ export default function Hero() {
   const reel = useRef<HTMLDivElement>(null);
   const phone = useRef<HTMLDivElement>(null);
   useShowreelScale(reel, phone);
+
+  const [videoId, setVideoId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let ignore = false;
+    newPageApi
+      .getIntro()
+      .then((intro) => {
+        if (!ignore) setVideoId(intro?.videoId ?? null);
+      })
+      .catch((error) => {
+        console.error("[Hero] Không tải được video intro:", error);
+      });
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   return (
     <header className="wrap pt-[72px] text-center" id="top">
@@ -38,19 +56,26 @@ export default function Hero() {
         <div
           ref={reel}
           className="showreel-bg rise d3 relative mx-auto mt-14 grid aspect-video max-w-[1024px] place-items-center overflow-hidden rounded-[28px] max-[640px]:aspect-[4/5] max-[640px]:rounded-[22px]"
-          role="img"
-          aria-label="Khung showreel, sẽ thay bằng video thật"
         >
           <div
             ref={phone}
-            className="phone-scale grid aspect-[9/19.5] w-[min(32%,250px)] place-items-center rounded-[34px] border-[6px] border-[#2b2b2e] bg-[#111] p-3 text-center text-[13px] text-[#86868b] shadow-[0_30px_80px_rgba(0,0,0,.6)] max-[640px]:w-[52%]"
+            className={`phone-scale relative isolate z-10 grid w-[min(32%,250px)] place-items-center overflow-hidden rounded-[34px] border-[6px] border-[#2b2b2e] bg-[#111] text-center text-[13px] text-[#86868b] shadow-[0_30px_80px_rgba(0,0,0,.6)] max-[640px]:w-[52%] ${
+              videoId ? "aspect-[9/16]" : "aspect-[9/19.5] p-3"
+            }`}
           >
-            <div>
-              <b className="mb-1 block text-[15px] font-semibold text-[#f5f5f7]">
+            {videoId ? (
+              <iframe
+                src={`https://iframe.mediadelivery.net/embed/${import.meta.env.VITE_BUNNY_LIBRARY_ID}/${videoId}?autoplay=true&muted=true&loop=true&preload=true&playsinline=true`}
+                title="Video showreel CWK Media"
+                className="absolute inset-0 h-full w-full border-0"
+                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <b className="block text-[15px] font-semibold text-[#f5f5f7]">
                 Showreel
               </b>
-              15–20 giây · thay bằng video thật
-            </div>
+            )}
           </div>
           <div className="glow pointer-events-none absolute inset-x-0 bottom-[-40%] h-[70%]"></div>
         </div>

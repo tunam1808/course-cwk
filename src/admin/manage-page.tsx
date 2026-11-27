@@ -26,6 +26,11 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/manage-page/courses", label: "Quản lý khóa học", icon: FiBookOpen },
   { to: "/manage-page/intro-manage", label: "Quản lý intro", icon: FiLayout },
   {
+    to: "/manage-page/landingpage-new",
+    label: "Intro landing page",
+    icon: FiLayout,
+  },
+  {
     to: "/manage-page/countdown-manage",
     label: "Quản lý ưu đãi",
     icon: FiClock,
